@@ -17,8 +17,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${fontDisplay.variable} ${fontBody.variable}`}>
-      <body className="antialiased bg-bg-primary text-text-primary font-sans flex flex-col min-h-screen">
+    <html lang="en" className={`${fontDisplay.variable} ${fontBody.variable}`} suppressHydrationWarning>
+      <body className="antialiased bg-bg-primary text-text-primary font-sans flex flex-col min-h-screen" suppressHydrationWarning>
         <SmoothScroll>
           <Navbar />
           <main className="flex-grow">

@@ -2,6 +2,7 @@
 
 import { useRef, useEffect } from "react";
 import { useScroll, useTransform, motion, type MotionValue } from "motion/react";
+import { Database, Code2, Network } from "lucide-react";
 
 function useScrollCanvas(canvasRef: React.RefObject<HTMLCanvasElement | null>, progress: { get: () => number }) {
   useEffect(() => {
@@ -99,30 +100,69 @@ function useScrollCanvas(canvasRef: React.RefObject<HTMLCanvasElement | null>, p
   }, [canvasRef, progress]);
 }
 
-// Glass Panel 
-function GlassPanel({
-  children,
+// Massive Split-Screen Glass Panel
+function SplitGlassPanel({
   opacity,
   y,
-  align = "left",
+  step,
+  title,
+  highlight,
+  description,
+  metrics,
+  Icon,
 }: {
-  children: React.ReactNode;
   opacity: MotionValue<number>;
   y: MotionValue<number>;
-  align?: "left" | "right" | "center";
+  step: string;
+  title: string;
+  highlight: string;
+  description: string;
+  metrics: string[];
+  Icon: any;
 }) {
   return (
     <motion.div
       style={{ opacity, y }}
-      className={`absolute top-1/2 -translate-y-1/2 max-w-lg z-20 ${
-        align === "right" ? "right-6 md:right-24" : align === "center" ? "left-1/2 -translate-x-1/2 text-center" : "left-6 md:left-24"
-      }`}
+      className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-5xl px-6 md:px-0 z-20"
     >
-      <div className="glass p-8 md:p-12 rounded-3xl backdrop-blur-2xl bg-[#0d1422]/60 border border-white/5 shadow-2xl relative overflow-hidden">
-        {/* Glow accent inside card */}
-        <div className="absolute -top-20 -left-20 w-40 h-40 bg-accent-blue/20 blur-3xl rounded-full pointer-events-none" />
-        <div className="relative z-10">
-          {children}
+      <div className="glass p-0 rounded-3xl backdrop-blur-2xl bg-[#0d1422]/70 border border-white/5 shadow-[0_0_100px_rgba(0,0,0,0.5)] relative overflow-hidden flex flex-col md:flex-row">
+        
+        {/* Left Side: Content */}
+        <div className="p-10 md:p-14 md:w-3/5 relative z-10 border-r border-white/5">
+          <p className="text-xs font-mono text-accent-blue tracking-[0.2em] uppercase mb-6 flex items-center gap-3">
+            <span className="w-6 h-[1px] bg-accent-blue" />
+            {step}
+          </p>
+          <h2 className="text-3xl md:text-5xl font-display text-text-primary leading-tight mb-6">
+            {title}{" "}
+            <span className="italic text-accent-soft block mt-2">{highlight}</span>
+          </h2>
+          <p className="text-text-subtle font-light leading-relaxed text-sm md:text-lg mb-8">
+            {description}
+          </p>
+          
+          <div className="flex flex-wrap gap-4">
+            {metrics.map((metric, i) => (
+              <div key={i} className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs font-mono text-white/80">
+                {metric}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Right Side: Visual Graphic */}
+        <div className="hidden md:flex md:w-2/5 bg-gradient-to-br from-black/40 to-black/80 items-center justify-center relative overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.1),transparent)]" />
+          <div className="relative z-10 w-32 h-32 rounded-full bg-white/5 border border-white/10 flex items-center justify-center shadow-[0_0_40px_rgba(59,130,246,0.2)]">
+             <Icon size={48} className="text-accent-blue opacity-80" strokeWidth={1} />
+          </div>
+          
+          {/* Decorative Code Lines */}
+          <div className="absolute top-12 right-12 opacity-20">
+            {Array.from({length: 6}).map((_, i) => (
+              <div key={i} className="h-1 bg-accent-blue rounded-full mb-3" style={{ width: Math.random() * 60 + 40 + 'px' }} />
+            ))}
+          </div>
         </div>
       </div>
     </motion.div>
@@ -144,7 +184,7 @@ export default function ScrollyCanvas() {
   const bgTextY1 = useTransform(scrollYProgress, [0, 1], ["0%", "-40%"]);
   const bgTextY2 = useTransform(scrollYProgress, [0, 1], ["20%", "-60%"]);
 
-  // Condense ranges: total height is now 300vh instead of 500vh
+  // Condense ranges: total height is 300vh
   // Panel 1: 0%–30% scroll
   const panel1Opacity = useTransform(scrollYProgress, [0, 0.1, 0.25, 0.35], [0, 1, 1, 0]);
   const panel1Y = useTransform(scrollYProgress, [0, 0.1, 0.25, 0.35], [60, 0, 0, -60]);
@@ -164,10 +204,10 @@ export default function ScrollyCanvas() {
         {/* Massive Background Outline Typography to fill empty space */}
         <div className="absolute inset-0 pointer-events-none z-0 flex flex-col justify-center overflow-hidden opacity-[0.03]">
           <motion.div style={{ y: bgTextY1 }} className="whitespace-nowrap font-display text-[20vw] leading-none font-bold text-transparent stroke-text">
-            SYSTEM ARCHITECTURE
+            ENTERPRISE SCALE
           </motion.div>
           <motion.div style={{ y: bgTextY2 }} className="whitespace-nowrap font-display text-[20vw] leading-none font-bold text-transparent stroke-text ml-[-10vw]">
-            PRODUCTION READY
+            AI INFRASTRUCTURE
           </motion.div>
         </div>
 
@@ -175,44 +215,38 @@ export default function ScrollyCanvas() {
         <canvas ref={canvasRef} className="absolute inset-0 w-full h-full z-10" />
 
         {/* Frosted Glass Panels */}
-        <GlassPanel opacity={panel1Opacity} y={panel1Y} align="left">
-          <p className="text-xs font-mono text-accent-blue tracking-[0.2em] uppercase mb-4">
-            01 / Background
-          </p>
-          <h2 className="text-3xl md:text-5xl font-display text-text-primary leading-tight mb-6">
-            3+ Years Building{" "}
-            <span className="italic text-accent-soft block mt-1">At Scale.</span>
-          </h2>
-          <p className="text-text-subtle font-light leading-relaxed text-sm md:text-base">
-            From enterprise platforms serving 10,000+ students to AI infrastructure on GPU clusters. I don't just write code; I design systems that hold up under pressure.
-          </p>
-        </GlassPanel>
+        <SplitGlassPanel 
+          opacity={panel1Opacity} 
+          y={panel1Y} 
+          step="01 / Infrastructure"
+          title="Building the Backbone of"
+          highlight="Tesseract & Trinetra."
+          description="Designed secure authentication with SuperTokens and built real-time cluster tracking. Tesseract auto-generates, assigns, and grades MCQs across multiple engineering colleges. I don't build toys; I build systems running live across KMIT, NGIT, KMEC, and KMCE."
+          metrics={["10,000+ Students", "Real-Time Tracking", "SuperTokens Auth"]}
+          Icon={Network}
+        />
 
-        <GlassPanel opacity={panel2Opacity} y={panel2Y} align="right">
-          <p className="text-xs font-mono text-accent-orange tracking-[0.2em] uppercase mb-4">
-            02 / Approach
-          </p>
-          <h2 className="text-3xl md:text-5xl font-display text-text-primary leading-tight mb-6">
-            End-to-End{" "}
-            <span className="italic text-orange-400 block mt-1">Ownership.</span>
-          </h2>
-          <p className="text-text-subtle font-light leading-relaxed text-sm md:text-base">
-            PostgreSQL schemas, REST APIs, middleware security, and responsive UI — I own the full lifecycle. No throwing code over the wall to another team.
-          </p>
-        </GlassPanel>
+        <SplitGlassPanel 
+          opacity={panel2Opacity} 
+          y={panel2Y} 
+          step="02 / Research"
+          title="Scaling Compute for"
+          highlight="DrugParadigm & Tantrik."
+          description="Built the entire frontend and monitoring dashboards for a 15-node GPU cluster dedicated to Alzheimer's research using Autodock Vina. Processed massive ligand-protein docking streams and visualized complex data at scale."
+          metrics={["15 GPU Nodes", "Autodock Vina", "Data Visualization"]}
+          Icon={Database}
+        />
 
-        <GlassPanel opacity={panel3Opacity} y={panel3Y} align="left">
-          <p className="text-xs font-mono text-accent-soft tracking-[0.2em] uppercase mb-4">
-            03 / Now
-          </p>
-          <h2 className="text-3xl md:text-5xl font-display text-text-primary leading-tight mb-6">
-            Integrating AI{" "}
-            <span className="italic text-accent-soft block mt-1">With Purpose.</span>
-          </h2>
-          <p className="text-text-subtle font-light leading-relaxed text-sm md:text-base">
-            Moving beyond simple wrappers. I build AI features like Gemini-powered grading engines and context-aware health coaches that make real products demonstrably better.
-          </p>
-        </GlassPanel>
+        <SplitGlassPanel 
+          opacity={panel3Opacity} 
+          y={panel3Y} 
+          step="03 / Integration"
+          title="Embedding AI with"
+          highlight="Catalyst."
+          description="A cross-platform React Native app with an embedded Gemini AI wellness coach. It tracks workouts, hydration, and nudges you when you're slipping. AI isn't a wrapper here; it's the core contextual driver of the user experience."
+          metrics={["React Native", "Gemini AI", "Context-Aware"]}
+          Icon={Code2}
+        />
 
         {/* Scroll progress bar */}
         <motion.div

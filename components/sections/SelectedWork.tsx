@@ -31,7 +31,7 @@ function StackedProjectCard({ project, index, total }: { project: Project; index
           ref={cardRef}
           style={{ scale, opacity }}
           onClick={() => setOpen(true)}
-          className="w-full max-w-5xl glass rounded-[2rem] p-8 md:p-14 cursor-pointer group hover:border-accent-blue/30 transition-colors shadow-2xl relative overflow-hidden"
+          className="w-full max-w-5xl glass !bg-[#050810]/95 rounded-[2rem] p-8 md:p-14 cursor-pointer group hover:border-accent-blue/30 transition-colors shadow-2xl relative overflow-hidden"
         >
           {/* Accent glow on hover */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-accent-blue/10 to-transparent rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />

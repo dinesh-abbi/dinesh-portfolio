@@ -10,47 +10,80 @@ export type Project = {
 
 export const projects: Project[] = [
   {
+    id: "trinetra",
+    title: "Trinetra & Sanchit",
+    subtitle: "Cross-Campus Enterprise Platform",
+    description:
+      "Academic management software and data distribution platform deployed live across KMIT, NGIT, KMEC, and KMCE — 4 engineering colleges serving 10,000+ students. Features a 5-tier RBAC system (Admin, Director, HOD, Teacher, Student) with centralized analytics that reduced HOD manual reporting by ~60%.",
+    detail:
+      "Architected the NestJS schema-driven backend with role-isolated data access and RESTful APIs consumed by the React frontend. Centralized student data, assignment tracking, and teaching-quality metrics into a single unified platform.",
+    stack: ["React", "Vite", "NestJS", "PHP", "PostgreSQL", "RBAC"],
+    tags: ["Enterprise", "Multi-tenant", "10,000+ Users"],
+  },
+  {
     id: "drugparadigm",
     title: "DrugParadigm & Tantrik",
     subtitle: "AI Research Infrastructure",
     description:
-      "Built the entire frontend and monitoring dashboards for a 15-node GPU research cluster used for drug-discovery AI inference. Designed secure auth with SuperTokens, created real-time cluster health dashboards, and wrote Playwright load-testing suites that caught 3 critical performance bottlenecks before the system went live.",
+      "Secure frontend and load-testing infrastructure for sensitive drug-discovery AI models inferencing on DGX GPU servers. Authored Playwright load-testing suites across a 15-node JupyterHub cluster, identifying 3 critical performance bottlenecks before launch.",
     detail:
-      "The system runs pharmaceutical AI models on NVIDIA DGX GPUs via JupyterHub. My Playwright suites simulated concurrent researcher sessions to expose bottlenecks at the gateway layer — issues that would have caused data loss mid-inference. The monitoring dashboard visualizes GPU utilization, model queue depth, and memory pressure in real time.",
+      "Implemented secure authentication and session management using SuperTokens. Built real-time monitoring dashboards giving researchers live visibility into GPU utilization and inference queues.",
     stack: ["React", "Vite", "NestJS", "SuperTokens", "Playwright", "JupyterHub"],
-    tags: ["AI Infrastructure", "Load Testing", "Secure Auth"],
+    tags: ["AI Infrastructure", "Load Testing", "GPU Cluster"],
   },
   {
     id: "tesseract",
     title: "Tesseract & Project School",
     subtitle: "AI-Powered EdTech Suite",
     description:
-      "Tesseract auto-generates, assigns, and grades MCQs and assignments using the Gemini API — cutting manual grading work for faculty. Project School is a companion app for milestone-driven student–mentor project management, both actively used in production across multiple colleges.",
+      "Multi-role assessment platform with AI-generated assignments and student milestone tracking. Built an AI assessment engine using the Gemini API that auto-generates, assigns, and grades MCQs and assignments.",
     detail:
-      "Tesseract integrates Gemini API at multiple points: question generation from syllabus content, answer evaluation with rubric-based scoring, and personalized feedback generation. I built the Redux state machine coordinating real-time timer tracking, question sequencing, and autosaving — as well as the anti-cheating UI layer.",
-    stack: ["React", "Redux", "NestJS", "Gemini API", "PostgreSQL"],
-    tags: ["Gemini API", "Auto-Grading", "EdTech"],
+      "Shipped companion Project School app for milestone-driven project tracking where mentors assign stages, review demos, and issue grades within a single interface. Optimized state management using Redux.",
+    stack: ["React", "Redux", "NestJS", "Gemini API", "TypeScript", "PostgreSQL"],
+    tags: ["Gemini API", "State Management", "EdTech"],
   },
   {
-    id: "trinetra",
-    title: "Trinetra & Sanchit",
-    subtitle: "Cross-Campus Enterprise Platform",
+    id: "vv-kaksha",
+    title: "VV Kaksha",
+    subtitle: "Interactive K-10 Educational PWA",
     description:
-      "Academic management software running live across KMIT, NGIT, KMEC, and KMCE — 4 engineering colleges serving 10,000+ students. A 5-level RBAC system (Admin, Director, HOD, Teacher, Student) with centralized analytics eliminated manual record-keeping and reduced reporting effort by ~60%.",
+      "Tablet-optimized Progressive Web App with interactive mechanics for K-10 classroom activities. Developed complex drag-and-drop puzzle mechanics with real-time feedback designed for low-powered tablet hardware.",
     detail:
-      "The multi-tenant architecture isolates data between institutions while enabling aggregated director-level reporting. I designed the PostgreSQL schema for cross-campus student record routing, implemented granular role checks in NestJS guards, and built the analytics dashboards that replaced 12+ manual spreadsheet processes.",
-    stack: ["React", "Vite", "NestJS", "PHP", "PostgreSQL", "RBAC"],
-    tags: ["Enterprise", "Multi-tenant", "10,000+ Users"],
+      "Delivered offline capabilities and achieved 100% responsive coverage across all mobile, tablet, and desktop breakpoints.",
+    stack: ["React", "TypeScript", "PWA", "Responsive UI/UX"],
+    tags: ["Progressive Web App", "Interactions", "Education"],
+  },
+  {
+    id: "roboparadigm",
+    title: "RoboParadigm",
+    subtitle: "Robotics Showcase Website",
+    description:
+      "Marketing and showcase website for a robotics company featuring an interactive 3D robot model. Integrated interactive Three.js graphics and scroll-driven Hero section animations.",
+    detail:
+      "Converted a robot model from Blender to GLB format and rendered it live in the browser using Three.js — giving visitors a real-time, interactive 3D product view.",
+    stack: ["React", "TypeScript", "Three.js", "Framer Motion", "TanStack Router", "Tailwind CSS"],
+    tags: ["Three.js", "3D Rendering", "Framer Motion"],
+  },
+  {
+    id: "applied-robotics",
+    title: "Applied Robotics Otto DIY Workshop",
+    subtitle: "Hardware & IoT Curriculum",
+    description:
+      "Engineered and programmed bipedal, humanoid, and quadruped robots from scratch using Arduino Nano and ESP32-CAM. Built wireless Android control interfaces students use to operate robots over BLE.",
+    detail:
+      "Calibrated servos, troubleshot hardware wiring, and authored comprehensive step-by-step workshop documentation covering wiring, servo calibration, and Otto Blockly programming.",
+    stack: ["Arduino Nano", "ESP32-CAM", "Otto Blockly", "Android", "BLE", "Servo Control"],
+    tags: ["IoT", "Hardware", "Robotics"],
   },
   {
     id: "catalyst",
     title: "Catalyst",
     subtitle: "AI Fitness & Hydration Tracker",
     description:
-      "A cross-platform React Native app with an embedded Gemini AI wellness coach that tracks workouts, hydration, and nudges you when you're slipping. Custom UI/UX, adaptive icons, and push notification reminders — all optimized for mobile performance.",
+      "Cross-platform mobile app for workout and hydration tracking with an AI wellness coach. Integrated Gemini API as an in-app conversational coach that responds to user activity data in context.",
     detail:
-      "The Gemini integration acts as a context-aware conversational coach — it sees your logged workout history and hydration data before responding, making advice personalized rather than generic. I optimized SQLite read performance to ensure zero-latency log updates, and configured Android push notifications to respect the user's activity patterns.",
+      "Built from scratch in React Native with custom UI/UX, adaptive icons, and push notification reminders.",
     stack: ["React Native", "Gemini API", "SQLite", "Android", "Push Notifications"],
-    tags: ["Mobile", "AI Coach", "React Native"],
+    tags: ["Mobile App", "Gemini API", "SQLite"],
   },
 ];

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "motion/react";
-import { Database, Layout, Server, Cpu } from "lucide-react";
+import { Database, Layout, Server, Cpu, Bot } from "lucide-react";
 
 // Terminal typing animation component
 function TerminalEffect() {
@@ -93,6 +93,27 @@ function AINodeEffect() {
           className="absolute inset-8 border border-dashed border-accent-orange/40 rounded-full"
         />
       </div>
+    </div>
+  );
+}
+
+// BLE Signal waves
+function BLESignalEffect() {
+  return (
+    <div className="absolute top-1/2 right-12 -translate-y-1/2 flex items-center gap-1.5 opacity-20 group-hover:opacity-50 transition-opacity">
+      {[1, 2, 3, 4, 5].map((i) => (
+        <motion.div
+          key={i}
+          animate={{ height: [8, 32, 8] }}
+          transition={{
+            repeat: Infinity,
+            duration: 1,
+            ease: "easeInOut",
+            delay: i * 0.15
+          }}
+          className="w-1 bg-accent-blue rounded-full"
+        />
+      ))}
     </div>
   );
 }
@@ -207,6 +228,28 @@ export default function WhatIDo() {
               <h3 className="text-lg font-display text-white mb-2 mt-12">Infrastructure</h3>
               <p className="text-text-muted text-sm leading-relaxed">
                 Playwright load testing, JupyterHub cluster management, and resilient system architecture.
+              </p>
+            </div>
+          </motion.div>
+
+          {/* Box 5: Robotics & Hardware (Wide, bottom row) */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-60px" }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+            className="md:col-span-3 glass rounded-3xl p-8 md:p-10 relative overflow-hidden group flex flex-col justify-end"
+          >
+            <BLESignalEffect />
+            <div className="absolute top-8 left-8 text-white/20 group-hover:text-accent-blue/40 transition-colors z-10">
+              <Bot size={40} strokeWidth={1} />
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0d1422] via-[#0d1422]/80 to-transparent opacity-90" />
+
+            <div className="relative z-10 max-w-2xl">
+              <h3 className="text-xl font-display text-white mb-3">Robotics & Hardware Integration</h3>
+              <p className="text-text-muted text-sm leading-relaxed">
+                Engineered and programmed bipedal, humanoid, and quadruped robots from scratch using Arduino Nano and ESP32-CAM. Developed custom Android apps to act as wireless remote controls over BLE, calibrated servos, and designed instructional curriculums.
               </p>
             </div>
           </motion.div>

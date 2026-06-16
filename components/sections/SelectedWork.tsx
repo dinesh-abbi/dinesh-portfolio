@@ -2,32 +2,44 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { ArrowRight, X, ExternalLink } from "lucide-react";
+import { ArrowRight, X } from "lucide-react";
 import { projects, type Project } from "@/data/projects";
 
-// Dedicated lists matching the resume exactly
+// Accurate, exact highlights from the 3 resumes
 const resumeHighlights: Record<string, string[]> = {
-  drugparadigm: [
-    "Designed secure auth architecture using SuperTokens for sensitive drug-discovery AI models inferencing on DGX GPU servers.",
-    "Wrote and executed comprehensive Playwright load-testing suites across a 15-node JupyterHub cluster; identified and resolved 3 critical performance bottlenecks before production launch.",
-    "Built real-time monitoring dashboards giving researchers visibility into GPU utilisation and model inference queues."
-  ],
-  tesseract: [
-    "Built AI assessment engine that auto-generates contextual MCQs and assignments, auto-grades submissions, and provides role-specific dashboards for teachers, students, and admins.",
-    "Shipped companion Project School app for milestone-driven project tracking; mentors can assign stages, review demos, and issue grades — all within a single interface."
-  ],
   trinetra: [
     "Multi-tenant platform live across KMIT, NGIT, KMEC, and KMCE; serves 10,000+ students with a 5-level role hierarchy and cross-campus analytics.",
     "Eliminated manual record-keeping by centralising student data, assignment tracking, and teaching-quality metrics in a single unified system.",
-    "Implemented granular access control ensuring data isolation between institutions while enabling aggregated director-level reporting."
+    "Designed NestJS schema-driven backend with role-isolated data access and RESTful APIs consumed by the React frontend."
+  ],
+  drugparadigm: [
+    "Implemented SuperTokens authentication and session management for sensitive drug-discovery AI research workflows on DGX GPU servers.",
+    "Authored and executed Playwright load-testing suites across a 15-node JupyterHub cluster, identifying 3 critical performance bottlenecks pre-launch.",
+    "Built real-time monitoring dashboards giving researchers live visibility into GPU utilisation and inference queues."
+  ],
+  tesseract: [
+    "Built AI assessment engine that auto-generates contextual MCQs and assignments, auto-grades submissions, and provides role-specific dashboards.",
+    "Shipped companion Project School app for milestone-driven project tracking; mentors can assign stages, review demos, and issue grades."
+  ],
+  "vv-kaksha": [
+    "Built complex drag-and-drop puzzle mechanics with real-time feedback, optimised for low-powered tablet hardware.",
+    "Delivered as a PWA with offline capability; achieved full responsive coverage across all breakpoints."
+  ],
+  roboparadigm: [
+    "Converted a robot model from Blender to GLB format and rendered it live in the browser using Three.js.",
+    "Built scroll-driven Hero section animation and designed Project Highlights card layout using Framer Motion."
+  ],
+  "applied-robotics": [
+    "Engineered and programmed bipedal, humanoid, and quadruped robots from scratch using Arduino Nano and ESP32-CAM.",
+    "Built wireless Android control interfaces students use to operate robots over BLE."
   ],
   catalyst: [
-    "Cross-platform mobile app with custom UI/UX, adaptive icons, and push notification reminders for workout and hydration goals.",
+    "Cross-platform mobile app with custom UI/UX, adaptive icons, and push notification reminders.",
     "Integrated Gemini API as an in-app conversational wellness coach that responds to user activity data in context."
   ]
 };
 
-function ProjectRow({ project, index }: { project: Project; index: number }) {
+function ProjectBlock({ project, index }: { project: Project; index: number }) {
   const [open, setOpen] = useState(false);
   const highlights = resumeHighlights[project.id] || [];
 
@@ -35,63 +47,61 @@ function ProjectRow({ project, index }: { project: Project; index: number }) {
     <>
       <div 
         onClick={() => setOpen(true)}
-        className="w-full py-16 border-b border-white/5 cursor-pointer group relative overflow-hidden transition-all duration-500 hover:bg-white/[0.01] px-6 md:px-12"
+        className="w-full py-20 border-b border-white/5 cursor-pointer group relative overflow-hidden transition-all duration-500 hover:bg-white/[0.01]"
       >
-        {/* Hover Background Glow */}
-        <div className="absolute inset-0 bg-gradient-to-r from-accent-blue/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+        {/* Soft Background Radial Glow on Hover */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.03),transparent)] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
 
-        <div className="max-w-6xl mx-auto flex flex-col lg:flex-row gap-12 lg:gap-16 items-start relative z-10">
+        <div className="max-w-4xl mx-auto px-6 md:px-12 relative z-10 flex flex-col items-center text-center">
+          {/* Index Number */}
+          <span className="text-4xl md:text-5xl font-mono text-accent-blue/30 group-hover:text-accent-blue/80 transition-colors duration-500 mb-4 block">
+            0{index + 1}
+          </span>
           
-          {/* Index & Basic Metadata (Left) */}
-          <div className="w-full lg:w-1/3 flex flex-col justify-between">
-            <div>
-              <span className="text-5xl md:text-7xl font-display font-light text-white/5 mb-4 block tracking-tighter group-hover:text-accent-blue/30 transition-colors">
-                0{index + 1}
+          {/* Subtitle */}
+          <p className="text-[10px] font-mono text-accent-orange tracking-[0.25em] uppercase mb-3">
+            {project.subtitle}
+          </p>
+
+          {/* Title */}
+          <h3 className="text-3xl md:text-5xl font-display text-text-primary mb-6 group-hover:text-white transition-colors duration-500 tracking-tight">
+            {project.title}
+          </h3>
+
+          {/* Tags */}
+          <div className="flex flex-wrap justify-center gap-2 mb-8">
+            {project.tags.map((tag) => (
+              <span key={tag} className="text-[9px] font-mono text-text-muted border border-white/5 bg-white/5 rounded-full px-3 py-1 uppercase tracking-wider">
+                {tag}
               </span>
-              <p className="text-xs font-mono text-accent-blue tracking-[0.2em] uppercase mb-4">
-                {project.subtitle}
-              </p>
-              <h3 className="text-2xl md:text-4xl font-display text-text-primary mb-6 group-hover:text-white transition-colors">
-                {project.title}
-              </h3>
-              
-              <div className="flex flex-wrap gap-2 mb-6">
-                {project.tags.map((tag) => (
-                  <span key={tag} className="text-[10px] font-mono text-text-muted border border-white/5 bg-white/5 rounded-full px-3 py-1 uppercase tracking-wider">
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            </div>
+            ))}
           </div>
 
-          {/* Description & Resume Bullets (Right) */}
-          <div className="w-full lg:w-2/3 flex flex-col">
-            <p className="text-text-subtle font-light leading-relaxed mb-8 text-base md:text-lg">
-              {project.description}
+          {/* Description */}
+          <p className="text-text-subtle font-light leading-relaxed text-base md:text-lg mb-8 max-w-2xl">
+            {project.description}
+          </p>
+
+          {/* Key Bullet Highlights */}
+          <ul className="space-y-4 mb-10 text-left max-w-xl">
+            {highlights.map((bullet, i) => (
+              <li key={i} className="flex items-start gap-3 text-sm font-light text-text-muted leading-relaxed">
+                <span className="w-1.5 h-1.5 rounded-full bg-accent-blue mt-2 flex-shrink-0" />
+                <span>{bullet}</span>
+              </li>
+            ))}
+          </ul>
+
+          {/* Stack & Call-to-action */}
+          <div className="w-full flex flex-col md:flex-row justify-between items-center gap-4 mt-4 border-t border-white/5 pt-6 max-w-2xl">
+            <p className="text-[11px] font-mono text-text-muted tracking-wider">
+              {project.stack.join(" · ")}
             </p>
-
-            {/* Bullet Points from Resume */}
-            <ul className="space-y-4 mb-8">
-              {highlights.map((bullet, i) => (
-                <li key={i} className="flex items-start gap-3 text-sm font-light text-text-muted leading-relaxed">
-                  <span className="w-1.5 h-1.5 rounded-full bg-accent-blue mt-2 flex-shrink-0" />
-                  <span>{bullet}</span>
-                </li>
-              ))}
-            </ul>
-
-            <div className="flex flex-wrap items-center justify-between gap-4 mt-auto border-t border-white/5 pt-6">
-              <p className="text-xs font-mono text-text-muted tracking-wider">
-                {project.stack.join(" · ")}
-              </p>
-              <div className="flex items-center gap-2 text-accent-blue text-sm font-medium group-hover:translate-x-2 transition-transform">
-                <span>Case Study</span>
-                <ArrowRight size={14} />
-              </div>
+            <div className="flex items-center gap-2 text-accent-blue text-xs font-mono uppercase tracking-widest group-hover:translate-x-2 transition-transform duration-300">
+              <span>View Case Study</span>
+              <ArrowRight size={12} />
             </div>
           </div>
-
         </div>
       </div>
 
@@ -176,7 +186,7 @@ export default function SelectedWork() {
   return (
     <section id="work" className="w-full bg-[#050810] relative pb-32">
       {/* Title Section */}
-      <div className="pt-32 pb-16 px-6 md:px-12 max-w-6xl mx-auto border-b border-white/5">
+      <div className="pt-32 pb-20 px-6 md:px-12 max-w-4xl mx-auto text-center border-b border-white/5">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -189,16 +199,16 @@ export default function SelectedWork() {
           <h2 className="text-4xl md:text-6xl font-display text-text-primary">
             Projects that shipped.
           </h2>
-          <p className="text-text-muted font-light mt-6 max-w-md text-lg">
+          <p className="text-text-muted font-light mt-6 max-w-md mx-auto text-base md:text-lg">
             Production systems with real users, built end-to-end.
           </p>
         </motion.div>
       </div>
 
-      {/* Clean, Open Rows Container */}
+      {/* Clean, Centered Blocks Container */}
       <div className="relative w-full">
         {projects.map((project, i) => (
-          <ProjectRow key={project.id} project={project} index={i} />
+          <ProjectBlock key={project.id} project={project} index={i} />
         ))}
       </div>
     </section>

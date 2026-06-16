@@ -1,27 +1,46 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
+import { z } from "zod";
 
-export async function POST(req: Request) {
+// Zod v4 schema — .parse() / .safeParse() API is unchanged from v3
+const contactSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Invalid email address"),
+  message: z.string().min(10, "Message must be at least 10 characters"),
+});
+
+export async function POST(request: Request) {
   try {
-    const resend = new Resend(process.env.RESEND_API_KEY || "fallback_key");
-    const { name, email, message } = await req.json();
+    const body = await request.json();
+    const parsed = contactSchema.safeParse(body);
 
-    if (!name || !email || !message) {
+    if (!parsed.success) {
+      // Zod v4: errors are on .error.issues (was .error.issues in v3 too, alias .flatten())
       return NextResponse.json(
-        { error: "Name, email, and message are required" },
+        { error: "Validation failed", issues: parsed.error.issues },
         { status: 400 }
       );
     }
 
-    const data = await resend.emails.send({
+    const { name, email, message } = parsed.data;
+
+    const resend = new Resend(process.env.RESEND_API_KEY ?? "");
+    const { error } = await resend.emails.send({
       from: "Portfolio Contact <onboarding@resend.dev>",
       to: "abhidinesh0215@gmail.com",
-      subject: `New Message from ${name}`,
-      text: `Name: ${name}\nEmail: ${email}\nMessage:\n${message}`,
+      replyTo: email,
+      subject: `Portfolio message from ${name}`,
+      text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
     });
 
-    return NextResponse.json(data);
-  } catch (error) {
-    return NextResponse.json({ error: "Failed to send message" }, { status: 500 });
+    if (error) {
+      console.error("Resend error:", error);
+      return NextResponse.json({ error: "Failed to send email" }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    console.error("Contact route error:", err);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

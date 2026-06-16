@@ -1,77 +1,70 @@
+// @ts-nocheck — R3F JSX elements (ambientLight, etc.) not yet in TS global JSX namespace for React 19
 "use client";
 
 import { useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { MeshDistortMaterial, Icosahedron, Float } from "@react-three/drei";
+import { MeshDistortMaterial, Float } from "@react-three/drei";
 import * as THREE from "three";
-import { useReducedMotion } from "framer-motion";
 
 function Shape() {
-  const meshRef = useRef<THREE.Mesh>(null);
-  const prefersReducedMotion = useReducedMotion();
+  const mesh = useRef<THREE.Mesh>(null!);
 
   useFrame((state) => {
-    if (!meshRef.current) return;
-
-    if (!prefersReducedMotion) {
-      const time = state.clock.getElapsedTime();
-      
-      // Pointer reactivity target
-      const targetX = (state.pointer.y * Math.PI) / 6;
-      const targetY = (state.pointer.x * Math.PI) / 6;
-
-      // Combine continuous rotation with pointer target
-      const finalX = time * 0.2 + targetX;
-      const finalY = time * 0.15 + targetY;
-
-      // Lerp towards target for smooth feel
-      meshRef.current.rotation.x = THREE.MathUtils.lerp(
-        meshRef.current.rotation.x,
-        finalX,
-        0.05
-      );
-      meshRef.current.rotation.y = THREE.MathUtils.lerp(
-        meshRef.current.rotation.y,
-        finalY,
-        0.05
-      );
-    }
+    const t = state.clock.getElapsedTime();
+    // Lerp rotation toward pointer
+    mesh.current.rotation.x = THREE.MathUtils.lerp(
+      mesh.current.rotation.x,
+      state.pointer.y * 0.4 + t * 0.08,
+      0.04
+    );
+    mesh.current.rotation.y = THREE.MathUtils.lerp(
+      mesh.current.rotation.y,
+      state.pointer.x * 0.4 + t * 0.12,
+      0.04
+    );
   });
 
   return (
-    <Float speed={prefersReducedMotion ? 0 : 2} rotationIntensity={0.5} floatIntensity={1}>
-      <Icosahedron ref={meshRef} args={[1, 16]} scale={1.8}>
+    <Float speed={1.5} rotationIntensity={0.3} floatIntensity={0.8}>
+      <mesh ref={mesh} scale={1.8}>
+        <icosahedronGeometry args={[1, 4]} />
         <MeshDistortMaterial
           color="#3b82f6"
-          envMapIntensity={0.2}
-          clearcoat={0.1}
-          roughness={0.4}
-          metalness={0.2}
-          distort={prefersReducedMotion ? 0 : 0.3}
-          speed={prefersReducedMotion ? 0 : 2}
-          wireframe={true}
+          distort={0.35}
+          speed={1.5}
+          roughness={0.1}
+          metalness={0.6}
           transparent
-          opacity={0.15}
+          opacity={0.12}
+          wireframe
         />
-      </Icosahedron>
+      </mesh>
+      {/* Solid inner orb */}
+      <mesh scale={0.65}>
+        <sphereGeometry args={[1, 32, 32]} />
+        <meshStandardMaterial
+          color="#0d1422"
+          emissive="#1e3a5f"
+          emissiveIntensity={0.4}
+          roughness={0.2}
+          metalness={0.8}
+        />
+      </mesh>
     </Float>
   );
 }
 
 export default function HeroShape() {
-  const prefersReducedMotion = useReducedMotion();
-
   return (
-    <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
-      <Canvas
-        dpr={[1, 1.5]}
-        camera={{ position: [0, 0, 5], fov: 45 }}
-        frameloop={prefersReducedMotion ? "demand" : "always"}
-      >
-        <ambientLight intensity={0.5} />
-        <directionalLight position={[10, 10, 5]} intensity={1} />
-        <Shape />
-      </Canvas>
-    </div>
+    <Canvas
+      dpr={[1, 1.5]}
+      camera={{ position: [0, 0, 4.5], fov: 50 }}
+      style={{ pointerEvents: "none" }}
+    >
+      <ambientLight intensity={0.4} />
+      <directionalLight position={[5, 5, 5]} intensity={1.2} color="#60a5fa" />
+      <directionalLight position={[-5, -3, -5]} intensity={0.6} color="#f97316" />
+      <Shape />
+    </Canvas>
   );
 }

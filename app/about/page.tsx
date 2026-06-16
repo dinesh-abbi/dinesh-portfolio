@@ -1,122 +1,148 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 
 const timeline = [
   {
-    role: "Software Developer",
-    entity: "Teleparadigm",
-    date: "2023 — Present",
+    year: "2019",
+    role: "B.Tech — Computer Science & Engineering",
+    org: "Keshav Memorial Institute of Technology (JNTUH)",
+    location: "Hyderabad",
+    detail: "Focused on data structures, algorithms, and systems programming. Graduated 2023.",
   },
   {
-    role: "B.Tech in Computer Science",
-    entity: "University",
-    date: "2019 — 2023",
-  }
+    year: "2023",
+    role: "Software Developer",
+    org: "Teleparadigm",
+    location: "Hyderabad, TG",
+    detail: "Jul 2023 – Present. Building multi-tenant platforms, AI-integrated EdTech, and GPU research infrastructure.",
+  },
 ];
 
-const techList = [
-  "React", "Next.js", "TypeScript", "Node.js", "NestJS", "PostgreSQL", 
-  "Python", "Tailwind CSS", "Docker", "Framer Motion", "React Native"
+const tech = [
+  "JavaScript", "TypeScript", "Python", "C/C++",
+  "React.js", "Redux", "Next.js", "Vite", "React Native",
+  "NestJS", "RESTful APIs", "Node.js", "PostgreSQL", "MySQL",
+  "Playwright", "Docker", "Git", "CI/CD", "JupyterHub",
+  "Gemini API", "SuperTokens", "Tailwind CSS", "PWA",
+];
+
+const certs = [
+  { name: "Meta Front-End Developer", issuer: "Meta · Coursera" },
+  { name: "Data Science & Engineering", issuer: "NPTEL" },
+  { name: "Data Structures & Algorithms", issuer: "Great Learning" },
 ];
 
 export default function AboutPage() {
   const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: { staggerChildren: 0.2 },
-    },
+    hidden: {},
+    show: { transition: { staggerChildren: 0.12 } },
   };
-
   const item = {
-    hidden: { opacity: 0, y: 16 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as const } },
   };
 
   return (
-    <div className="w-full pt-32 pb-24 px-6 md:px-12 bg-bg-primary min-h-screen flex flex-col items-center">
-      <motion.div 
-        variants={container}
-        initial="hidden"
-        animate="show"
-        className="w-full max-w-3xl flex flex-col gap-16 md:gap-24"
-      >
-        <motion.div variants={item}>
-          <h1 className="text-4xl md:text-5xl font-display text-text-primary mb-8 tracking-tight">
-            About
-          </h1>
-          <div className="flex flex-col gap-6 text-text-muted text-lg font-light leading-relaxed">
-            <p>
-              I build full-stack systems from the ground up. Currently at Teleparadigm, my work revolves around enterprise EdTech platforms, AI-powered assessment tools, and orchestrating robust GPU infrastructures for pharmaceutical research.
+    <div className="w-full pt-32 pb-28 px-6 md:px-12 bg-bg-primary min-h-screen">
+      <div className="max-w-4xl mx-auto">
+        <motion.div
+          variants={container}
+          initial="hidden"
+          animate="show"
+          className="flex flex-col gap-20 md:gap-28"
+        >
+          {/* Bio */}
+          <motion.div variants={item}>
+            <p className="text-xs font-mono text-accent-blue tracking-[0.2em] uppercase mb-6">
+              About
             </p>
-            <p>
-              My approach to engineering is straightforward: prioritize efficiency, write clean code, and keep security in mind from day one. I care deeply about the user experience, but I know that a great interface is only as good as the resilient backend supporting it.
-            </p>
-            <p>
-              Outside of building robust products for work, I spend my time exploring what's next in AI, fine-tuning workflows, and optimizing complex systems just to see how fast they can go.
-            </p>
-          </div>
-        </motion.div>
-
-        <motion.div variants={item}>
-          <h2 className="text-2xl font-display text-text-primary mb-8">
-            Experience
-          </h2>
-          <div className="flex flex-col md:flex-row w-full relative">
-            {/* Animated horizontal line for desktop */}
-            <div className="hidden md:block absolute top-[11px] left-0 w-full h-[1px] bg-border-custom overflow-hidden">
-              <motion.div 
-                className="w-full h-full bg-accent-soft origin-left"
-                initial={{ scaleX: 0 }}
-                animate={{ scaleX: 1 }}
-                transition={{ duration: 1.2, delay: 0.5, ease: "easeInOut" }}
-              />
+            <h1 className="text-4xl md:text-5xl font-display text-text-primary mb-10 leading-tight">
+              Dinesh Abbi
+            </h1>
+            <div className="grid md:grid-cols-2 gap-8 text-text-muted font-light leading-relaxed text-base">
+              <p>
+                I'm a Software Developer at Teleparadigm (Jul 2023 – present), where I build enterprise web platforms, AI-powered EdTech tools, and secure research infrastructure. My work spans the full stack — from PostgreSQL schema design and NestJS APIs to React frontends and mobile apps.
+              </p>
+              <p>
+                Before that, I completed my B.Tech in Computer Science & Engineering at Keshav Memorial Institute of Technology (KMIT, JNTUH) in Hyderabad in 2023. I've shipped systems that serve 10,000+ students across 4 colleges and AI infrastructure running on GPU clusters. I care about code quality, testing discipline, and shipping on time.
+              </p>
             </div>
-            
-            {/* Animated vertical line for mobile */}
-            <div className="md:hidden absolute left-[5px] top-0 h-full w-[1px] bg-border-custom overflow-hidden">
-              <motion.div 
-                className="w-full h-full bg-accent-soft origin-top"
-                initial={{ scaleY: 0 }}
-                animate={{ scaleY: 1 }}
-                transition={{ duration: 1.2, delay: 0.5, ease: "easeInOut" }}
-              />
-            </div>
+            <p className="mt-6 text-text-muted font-light leading-relaxed">
+              Lately I've been deepening my work in AI integration — building features with the Gemini API that make products meaningfully smarter rather than superficially "AI-powered." I'm interested in the intersection of robust backend systems and intelligent frontends.
+            </p>
+          </motion.div>
 
-            <div className="flex flex-col md:flex-row gap-12 md:gap-8 w-full z-10">
-              {timeline.map((entry, idx) => (
-                <div key={idx} className="flex flex-col pl-6 md:pl-0 pt-0 md:pt-8 relative flex-1">
-                  {/* Timeline dot */}
-                  <div className="absolute left-0 md:left-auto md:top-[-4px] top-[6px] w-3 h-3 bg-bg-primary border-2 border-accent-soft rounded-full" />
-                  
-                  <h3 className="text-lg font-medium text-text-primary mb-1">
-                    {entry.role}
-                  </h3>
-                  <p className="text-text-primary mb-2">{entry.entity}</p>
-                  <p className="text-sm font-mono text-text-muted">{entry.date}</p>
+          {/* Timeline */}
+          <motion.div variants={item}>
+            <p className="text-xs font-mono text-accent-blue tracking-[0.2em] uppercase mb-10">
+              Timeline
+            </p>
+            <div className="relative">
+              {/* Connecting line */}
+              <div className="hidden md:block absolute top-[14px] left-0 right-0 h-[1px] bg-border-glass overflow-hidden">
+                <motion.div
+                  className="h-full bg-gradient-to-r from-accent-blue to-accent-orange origin-left"
+                  initial={{ scaleX: 0 }}
+                  whileInView={{ scaleX: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 1.2, delay: 0.3, ease: "easeInOut" }}
+                />
+              </div>
+
+              <div className="flex flex-col md:flex-row gap-12 md:gap-0 relative z-10">
+                {timeline.map((entry) => (
+                  <div key={entry.year} className="flex-1 md:pr-8">
+                    <div className="flex items-center gap-3 mb-5">
+                      <div className="w-3.5 h-3.5 rounded-full border-2 border-accent-blue bg-bg-primary shrink-0" />
+                      <span className="text-xs font-mono text-accent-blue">{entry.year}</span>
+                    </div>
+                    <h3 className="text-base font-medium text-text-primary mb-1">{entry.role}</h3>
+                    <p className="text-sm text-text-subtle mb-1">{entry.org}</p>
+                    <p className="text-xs font-mono text-text-muted mb-3">{entry.location}</p>
+                    <p className="text-sm text-text-muted font-light leading-relaxed">{entry.detail}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Tech */}
+          <motion.div variants={item}>
+            <p className="text-xs font-mono text-accent-blue tracking-[0.2em] uppercase mb-6">
+              Technologies
+            </p>
+            <div className="flex flex-wrap items-center gap-x-0 gap-y-2 text-text-muted font-light text-sm leading-loose">
+              {tech.map((t, i) => (
+                <span key={t} className="flex items-center">
+                  <span className="hover:text-text-subtle transition-colors">{t}</span>
+                  {i < tech.length - 1 && (
+                    <span className="mx-3 text-border-glass text-[10px]">●</span>
+                  )}
+                </span>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Certifications */}
+          <motion.div variants={item}>
+            <p className="text-xs font-mono text-accent-blue tracking-[0.2em] uppercase mb-8">
+              Certifications
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {certs.map((c) => (
+                <div
+                  key={c.name}
+                  className="glass glass-hover rounded-lg p-5"
+                >
+                  <p className="text-sm font-medium text-text-primary mb-1.5">{c.name}</p>
+                  <p className="text-xs font-mono text-text-muted">{c.issuer}</p>
                 </div>
               ))}
             </div>
-          </div>
+          </motion.div>
         </motion.div>
-
-        <motion.div variants={item}>
-          <h2 className="text-2xl font-display text-text-primary mb-6">
-            Technologies
-          </h2>
-          <div className="flex flex-wrap items-center gap-y-3 gap-x-2 text-text-muted font-light leading-relaxed">
-            {techList.map((tech, idx) => (
-              <span key={idx} className="flex items-center">
-                {tech}
-                {idx !== techList.length - 1 && (
-                  <span className="mx-3 text-border-custom text-xs">●</span>
-                )}
-              </span>
-            ))}
-          </div>
-        </motion.div>
-      </motion.div>
+      </div>
     </div>
   );
 }

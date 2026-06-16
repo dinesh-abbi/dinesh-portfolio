@@ -1,15 +1,17 @@
-import Hero from "../components/sections/Hero";
-import WhatIDo from "../components/sections/WhatIDo";
-import SelectedWork from "../components/sections/SelectedWork";
-import ContactTeaser from "../components/sections/ContactTeaser";
+import Hero from "@/components/sections/Hero";
+import ScrollyCanvas from "@/components/sections/ScrollyCanvas";
+import WhatIDo from "@/components/sections/WhatIDo";
+import SelectedWork from "@/components/sections/SelectedWork";
+import ContactTeaser from "@/components/sections/ContactTeaser";
 
 export default function Home() {
   return (
-    <div className="flex flex-col w-full">
+    <>
       <Hero />
+      <ScrollyCanvas />
       <WhatIDo />
       <SelectedWork />
       <ContactTeaser />
-    </div>
+    </>
   );
 }

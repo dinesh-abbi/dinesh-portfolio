@@ -1,164 +1,161 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
-import { ArrowRight, X } from "lucide-react";
+import { useScroll, useTransform, motion, AnimatePresence } from "motion/react";
+import { ArrowRight, X, ExternalLink } from "lucide-react";
+import { projects, type Project } from "@/data/projects";
 
-type Project = {
-  id: string;
-  title: string;
-  description: string;
-  stack: string;
-  details: string;
-};
-
-const projects: Project[] = [
-  {
-    id: "drugparadigm",
-    title: "DrugParadigm",
-    description: "AI-powered drug discovery platform. Built the frontend and monitoring dashboards for a 15-node GPU research cluster, plus the load-testing setup that caught performance issues before researchers ever hit them.",
-    stack: "React, SuperTokens, Playwright, JupyterHub, Docker",
-    details: "I configured and managed JupyterHub gateway instances running on NVIDIA DGX clusters, implemented secure SSO with SuperTokens, and created end-to-end load simulations. The clean monitoring dashboards visualized live CPU/GPU temperatures, workloads, and memory utilization in real-time."
-  },
-  {
-    id: "tesseract",
-    title: "Tesseract",
-    description: "An assessment platform that uses the Gemini API to generate and grade questions automatically, cutting manual grading work for faculty.",
-    stack: "React, Redux, NestJS, Gemini API, PostgreSQL",
-    details: "Built the Redux state slices coordinating real-time timer tracking, question sequencing, and autosaving. I also implemented a secure assessment-proctoring UI restricting copy-pasting, tab switching, and window resizing, combined with automated rubric grading pipelines."
-  },
-  {
-    id: "catalyst",
-    title: "Catalyst",
-    description: "A React Native fitness app with an AI coach built on the Gemini API — tracks workouts and hydration, and nudges you when you're slipping.",
-    stack: "React Native, Gemini API, SQLite",
-    details: "Developed a responsive cross-platform layout optimized for mobile screens. The app connects users to a fine-tuned Gemini AI health coach for personalized diet and workout tips, utilizing local SQLite storage for zero-latency logging and local push notifications for customized hydration alerts."
-  },
-  {
-    id: "trinetra",
-    title: "Trinetra / Sanchit",
-    description: "Academic management software running across multiple colleges, handling everything from grading workflows to cross-campus reporting.",
-    stack: "React, NestJS, PostgreSQL, Tailwind",
-    details: "Engineered a 5-level Role-Based Access Control (RBAC) security system and optimized complex PostgreSQL queries supporting active students across multiple campuses. The high-throughput data import utilities cut processing time for student records significantly."
-  }
-];
-
-function ProjectItem({ project, index, onOpen }: { project: Project; index: number; onOpen: (p: Project) => void }) {
+function ProjectRow({ project, index }: { project: Project; index: number }) {
   const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"]
-  });
-  
-  const y = useTransform(scrollYProgress, [0, 1], [40, -40]);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
+  const y = useTransform(scrollYProgress, [0, 1], [50, -50]);
   const isEven = index % 2 === 0;
+  const [open, setOpen] = useState(false);
 
   return (
-    <div ref={ref} className="w-full py-20 md:py-32 border-b border-border-custom last:border-0 relative">
-      <motion.div 
-        style={{ y }}
-        className={`flex flex-col ${isEven ? 'md:items-start md:text-left' : 'md:items-end md:text-right'} w-full`}
+    <>
+      <div
+        ref={ref}
+        className="group relative border-t border-border-glass py-10 md:py-14 overflow-hidden cursor-pointer"
+        onClick={() => setOpen(true)}
       >
-        <h3 className="text-4xl md:text-6xl font-display text-text-primary mb-6 tracking-tight">
-          {project.title}
-        </h3>
-        <p className="text-text-muted text-lg md:text-xl font-light leading-relaxed max-w-2xl mb-8">
-          {project.description}
-        </p>
-        <div className={`flex flex-col gap-6 w-full max-w-2xl ${isEven ? 'md:items-start' : 'md:items-end'}`}>
-          <p className="text-sm text-text-muted font-mono tracking-wide">
-            {project.stack}
-          </p>
-          <button 
-            onClick={() => onOpen(project)}
-            className="group flex items-center gap-2 text-sm uppercase tracking-widest text-accent-soft hover:text-text-primary transition-colors duration-300"
-          >
-            <span className="relative">
-              View More
-              <span className="absolute left-0 bottom-0 w-full h-[1px] bg-accent-soft group-hover:bg-text-primary scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
-            </span>
-            <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform duration-300" />
-          </button>
-        </div>
-      </motion.div>
-    </div>
-  );
-}
+        {/* Hover shimmer bg */}
+        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none bg-gradient-card" />
 
-export default function SelectedWork() {
-  const [activeProject, setActiveProject] = useState<Project | null>(null);
-
-  return (
-    <section className="w-full py-24 px-6 md:px-12 bg-bg-primary overflow-hidden">
-      <div className="max-w-5xl mx-auto">
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-          className="mb-16 md:mb-24"
+          style={{ y }}
+          className={`flex flex-col ${isEven ? "md:flex-row" : "md:flex-row-reverse"} items-start md:items-center gap-8 md:gap-16`}
         >
-          <h2 className="text-3xl md:text-4xl font-display text-text-primary">
-            Selected Work
-          </h2>
-        </motion.div>
+          {/* Index */}
+          <span className="text-[11px] font-mono text-text-muted shrink-0 w-8">
+            {String(index + 1).padStart(2, "0")}
+          </span>
 
-        <div className="flex flex-col">
-          {projects.map((project, idx) => (
-            <ProjectItem 
-              key={project.id} 
-              project={project} 
-              index={idx} 
-              onOpen={setActiveProject} 
-            />
-          ))}
-        </div>
+          {/* Main content */}
+          <div className={`flex-1 ${isEven ? "" : "md:text-right"}`}>
+            <div className="flex items-center gap-3 mb-1.5 flex-wrap">
+              {project.tags.map((tag) => (
+                <span key={tag} className="text-[10px] font-mono text-accent-blue border border-border-blue rounded-full px-2.5 py-0.5 uppercase tracking-wider">
+                  {tag}
+                </span>
+              ))}
+            </div>
+            <h3 className="text-2xl md:text-3xl font-display text-text-primary mb-3 group-hover:text-white transition-colors">
+              {project.title}
+            </h3>
+            <p className="text-text-muted font-light leading-relaxed max-w-xl text-sm md:text-base">
+              {project.description}
+            </p>
+          </div>
+
+          {/* Stack + Arrow */}
+          <div className={`shrink-0 flex flex-col gap-4 ${isEven ? "md:items-end" : ""}`}>
+            <p className="text-[11px] font-mono text-text-muted leading-relaxed max-w-[180px] text-right">
+              {project.stack.join(" · ")}
+            </p>
+            <div className="flex items-center gap-1.5 text-accent-blue text-xs font-medium group-hover:gap-3 transition-all">
+              <span>View Details</span>
+              <ArrowRight size={12} />
+            </div>
+          </div>
+        </motion.div>
       </div>
 
-      {/* Slide-in panel */}
+      {/* Slide-in detail panel */}
       <AnimatePresence>
-        {activeProject && (
+        {open && (
           <>
-            <motion.div 
-              initial={{ opacity: 0 }} 
-              animate={{ opacity: 1 }} 
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onClick={() => setActiveProject(null)}
               className="fixed inset-0 bg-bg-primary/80 backdrop-blur-sm z-40"
+              onClick={() => setOpen(false)}
             />
             <motion.div
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
-              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              transition={{ type: "spring", damping: 28, stiffness: 220 }}
               data-lenis-prevent
-              className="fixed top-0 right-0 bottom-0 w-full md:w-[500px] bg-bg-elevated border-l border-border-custom z-50 p-8 md:p-12 overflow-y-auto"
+              className="fixed top-0 right-0 bottom-0 w-full md:w-[520px] glass border-l border-border-glass z-50 p-8 md:p-12 overflow-y-auto"
             >
-              <button 
-                onClick={() => setActiveProject(null)}
-                className="absolute top-8 right-8 text-text-muted hover:text-text-primary transition-colors"
+              <button
+                onClick={() => setOpen(false)}
+                className="absolute top-8 right-8 p-2 text-text-muted hover:text-text-primary hover:bg-bg-elevated rounded-full transition-colors"
               >
-                <X size={24} />
+                <X size={18} />
               </button>
-              <div className="mt-16">
-                <h3 className="text-3xl font-display text-text-primary mb-6">
-                  {activeProject.title}
+
+              <div className="mt-12">
+                <p className="text-xs font-mono text-accent-blue tracking-[0.2em] uppercase mb-3">
+                  {project.subtitle}
+                </p>
+                <h3 className="text-2xl md:text-3xl font-display text-text-primary mb-8">
+                  {project.title}
                 </h3>
-                <p className="text-text-muted font-mono text-sm mb-8">
-                  {activeProject.stack}
-                </p>
-                <div className="h-[1px] w-full bg-border-custom mb-8" />
-                <h4 className="text-sm uppercase tracking-widest text-text-primary mb-4">
-                  Details
+
+                <div className="h-[1px] w-full bg-gradient-to-r from-accent-blue/30 via-accent-orange/20 to-transparent mb-8" />
+
+                <h4 className="text-xs font-mono uppercase tracking-widest text-text-muted mb-4">
+                  Deep Dive
                 </h4>
-                <p className="text-text-muted leading-relaxed font-light">
-                  {activeProject.details}
+                <p className="text-text-subtle leading-relaxed font-light mb-10 text-sm">
+                  {project.detail}
                 </p>
+
+                <h4 className="text-xs font-mono uppercase tracking-widest text-text-muted mb-4">
+                  Stack
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {project.stack.map((s) => (
+                    <span
+                      key={s}
+                      className="text-xs font-mono text-text-subtle px-3 py-1.5 border border-border-glass rounded-full"
+                    >
+                      {s}
+                    </span>
+                  ))}
+                </div>
               </div>
             </motion.div>
           </>
         )}
       </AnimatePresence>
+    </>
+  );
+}
+
+export default function SelectedWork() {
+  return (
+    <section id="work" className="w-full py-24 md:py-32 px-6 md:px-12 bg-bg-primary">
+      <div className="max-w-6xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
+          className="mb-16 md:mb-20 flex flex-col md:flex-row md:items-end justify-between gap-6"
+        >
+          <div>
+            <p className="text-xs font-mono text-accent-blue tracking-[0.2em] uppercase mb-4">
+              Selected Work
+            </p>
+            <h2 className="text-3xl md:text-4xl font-display text-text-primary">
+              Projects that shipped.
+            </h2>
+          </div>
+          <p className="text-text-muted font-light max-w-xs text-sm md:text-right">
+            Production systems with real users, not demos.
+          </p>
+        </motion.div>
+
+        <div className="border-b border-border-glass">
+          {projects.map((project, i) => (
+            <ProjectRow key={project.id} project={project} index={i} />
+          ))}
+        </div>
+      </div>
     </section>
   );
 }

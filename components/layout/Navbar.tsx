@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
@@ -23,8 +24,8 @@ export default function Navbar() {
       }`}
     >
       <div className="max-w-5xl mx-auto px-6 md:px-12 flex justify-between items-center">
-        <Link href="/" className="font-display text-xl font-medium tracking-wide">
-          DA.
+        <Link href="/" className="flex items-center gap-2">
+          <Image src="/icon.png" alt="Dinesh Abbi Logo" width={32} height={32} className="rounded-sm" />
         </Link>
         <nav className="flex gap-6 md:gap-8 text-sm text-text-muted">
           {[

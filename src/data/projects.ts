@@ -6,6 +6,7 @@ export interface Project {
   stack: string[];
   contributions: string[];
   metrics: string[];
+  url?: string;
 }
 
 export const projectsData: Project[] = [

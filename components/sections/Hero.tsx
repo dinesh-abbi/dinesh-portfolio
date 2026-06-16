@@ -3,143 +3,145 @@
 import { useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import { motion } from "motion/react";
-import { ArrowDown } from "lucide-react";
 
-const HeroShape = dynamic(() => import("@/components/three/HeroShape"), {
-  ssr: false,
-});
+const CursorSpotlight = dynamic(() => import("@/components/ui/CursorSpotlight"), { ssr: false });
+const AmbientCanvas = dynamic(() => import("@/components/ui/AmbientCanvas"), { ssr: false });
 
-const TITLE = "Dinesh Abbi";
+// Split name into two rows with per-character spans
+const LINE1 = "DINESH";
+const LINE2 = "ABBI";
+
+function NameLine({ text, delay = 0 }: { text: string; delay?: number }) {
+  return (
+    <div className="flex items-center justify-center overflow-hidden">
+      {text.split("").map((char, i) => (
+        <span
+          key={`${text}-${i}`}
+          className="hero-char inline-block"
+          style={{
+            opacity: 0,
+            filter: "blur(20px)",
+            display: "inline-block",
+            // Prevent layout shift when blur animates
+            willChange: "opacity, filter, letter-spacing",
+          }}
+        >
+          {char}
+        </span>
+      ))}
+    </div>
+  );
+}
 
 export default function Hero() {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const hasAnimated = useRef(false);
 
-  // Anime.js v4 character reveal
   useEffect(() => {
-    const load = async () => {
-      const { animate } = await import("animejs");
+    if (hasAnimated.current) return;
+    hasAnimated.current = true;
 
+    const run = async () => {
+      const { animate, stagger } = await import("animejs");
+
+      // Character blur-condense reveal — the main event
       animate(".hero-char", {
-        translateY: [60, 0],
         opacity: [0, 1],
+        filter: ["blur(20px)", "blur(0px)"],
         ease: "outExpo",
-        duration: 1400,
-        delay: (_el: Element, i: number) => 80 + i * 55,
+        duration: 1200,
+        delay: stagger(55, { start: 200 }),
       });
 
-      animate(".hero-sub", {
-        opacity: [0, 1],
-        translateY: [24, 0],
-        ease: "outCubic",
-        duration: 900,
-        delay: 900,
-      });
-
-      animate(".hero-meta", {
+      // Tagline fade after letters settle
+      animate(".hero-tagline", {
         opacity: [0, 1],
         translateY: [16, 0],
         ease: "outCubic",
-        duration: 700,
-        delay: 1200,
-      });
-
-      animate(".hero-cta", {
-        opacity: [0, 1],
-        translateY: [12, 0],
-        ease: "outCubic",
-        duration: 700,
+        duration: 900,
         delay: 1400,
       });
+
+      // Scroll cue last
+      animate(".hero-scroll-line", {
+        opacity: [0, 1],
+        scaleY: [0, 1],
+        ease: "outCubic",
+        duration: 700,
+        delay: 2000,
+      });
     };
-    load();
+
+    run();
   }, []);
 
   return (
-    <section
-      ref={containerRef}
-      className="relative w-full min-h-screen flex items-center overflow-hidden bg-bg-primary"
-    >
-      {/* Castimedia cinematic background gradients */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 right-0 w-[50vw] h-[70vh] rounded-full opacity-[0.07] blur-[120px] bg-accent-orange" />
-        <div className="absolute bottom-0 left-0 w-[40vw] h-[60vh] rounded-full opacity-[0.06] blur-[100px] bg-accent-blue" />
-        <div className="absolute top-[30%] left-[30%] w-[30vw] h-[30vh] rounded-full opacity-[0.04] blur-[80px] bg-accent-blue" />
-      </div>
+    <>
+      {/* Ambient background canvas */}
+      <AmbientCanvas />
 
-      {/* 3D canvas — right side */}
-      <div className="absolute right-0 top-0 bottom-0 w-[55%] lg:w-[50%] pointer-events-none">
-        <HeroShape />
-      </div>
+      {/* Cursor flashlight */}
+      <CursorSpotlight />
 
-      {/* Content */}
-      <div className="relative z-10 w-full max-w-6xl mx-auto px-6 md:px-12 pt-32 pb-20">
-        <div className="max-w-2xl">
-          {/* Label */}
-          <p className="hero-meta opacity-0 inline-flex items-center gap-2 text-xs font-mono text-accent-blue tracking-[0.2em] uppercase mb-8">
-            <span className="w-6 h-[1px] bg-accent-blue" />
-            Software Developer · Full-Stack
-          </p>
+      {/* Hidden dot grid — only visible through the spotlight */}
+      <div
+        aria-hidden
+        className="fixed inset-0 -z-[5] pointer-events-none"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle, rgba(255,255,255,0.18) 1px, transparent 1px)",
+          backgroundSize: "32px 32px",
+          maskImage:
+            "radial-gradient(ellipse 70% 70% at 50% 50%, transparent 100%, black 100%)",
+        }}
+      />
 
-          {/* Name */}
-          <h1 className="hero-name flex flex-wrap text-[clamp(3.5rem,8vw,6.5rem)] font-display font-medium leading-[0.95] tracking-tight text-text-primary mb-8">
-            {TITLE.split("").map((char, i) => (
-              <span
-                key={i}
-                className="hero-char inline-block opacity-0"
-                style={{ whiteSpace: char === " " ? "pre" : "normal" }}
-              >
-                {char}
-              </span>
-            ))}
-          </h1>
-
-          {/* Tagline */}
-          <p className="hero-sub opacity-0 text-xl md:text-2xl text-text-subtle font-light leading-relaxed max-w-xl mb-10">
-            I build full-stack systems end-to-end —{" "}
-            <em className="not-italic text-text-muted">
-              and increasingly, integrate AI into real products.
-            </em>
-          </p>
-
-          {/* CTAs */}
-          <div className="hero-cta opacity-0 flex flex-wrap items-center gap-4">
-            <a
-              href="#work"
-              className="group inline-flex items-center gap-2.5 px-6 py-3.5 bg-accent-blue text-white text-sm font-medium rounded-full hover:bg-blue-400 transition-all duration-300 hover:shadow-[0_0_30px_rgba(59,130,246,0.4)]"
-            >
-              See My Work
-              <ArrowDown size={14} className="group-hover:translate-y-0.5 transition-transform" />
-            </a>
-            <a
-              href="/contact"
-              className="inline-flex items-center gap-2.5 px-6 py-3.5 border border-border-glass text-text-subtle text-sm font-medium rounded-full hover:border-border-blue hover:text-text-primary transition-all duration-300"
-            >
-              Get in Touch
-            </a>
+      {/* Main hero content */}
+      <section
+        className="relative flex flex-col items-center justify-center w-full min-h-screen overflow-hidden"
+        aria-label="Dinesh Abbi — Portfolio"
+      >
+        {/* Name block — center stage */}
+        <div className="relative z-20 flex flex-col items-center select-none px-4">
+          {/* LINE 1 */}
+          <div
+            className="font-display font-medium tracking-[0.08em] text-[clamp(4.5rem,13vw,10.5rem)] leading-none text-[#ebebeb]"
+            style={{ letterSpacing: "0.06em" }}
+          >
+            <NameLine text={LINE1} />
           </div>
 
-          {/* Tech stack pill row */}
-          <div className="hero-meta opacity-0 flex flex-wrap gap-2 mt-12">
-            {["React", "TypeScript", "NestJS", "PostgreSQL", "React Native", "Gemini API"].map((t) => (
-              <span
-                key={t}
-                className="text-[11px] font-mono text-text-muted px-3 py-1 border border-border-glass rounded-full hover:border-border-blue hover:text-text-subtle transition-colors"
-              >
-                {t}
-              </span>
-            ))}
+          {/* LINE 2 — italic, slightly smaller to break symmetry */}
+          <div
+            className="font-display italic font-light tracking-[0.12em] text-[clamp(3.8rem,11.5vw,9.5rem)] leading-none mt-[-0.04em]"
+            style={{ color: "#c8c8c8" }}
+          >
+            <NameLine text={LINE2} delay={LINE1.length * 55} />
           </div>
         </div>
-      </div>
 
-      {/* Scroll indicator */}
-      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
-        <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-          className="w-[1px] h-12 bg-gradient-to-b from-transparent via-border-blue to-transparent"
-        />
-      </div>
-    </section>
+        {/* Tagline — single line, centered, below name */}
+        <p
+          className="hero-tagline relative z-20 mt-12 text-sm md:text-base font-light tracking-[0.25em] uppercase text-[#4a5568] opacity-0"
+          style={{ fontFamily: "var(--font-inter)" }}
+        >
+          Building systems that work.
+        </p>
+
+        {/* Scroll cue — thin pulsing line at bottom center */}
+        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 z-20">
+          <div
+            className="hero-scroll-line origin-top opacity-0"
+            style={{ width: 1, height: 56, background: "linear-gradient(to bottom, transparent, rgba(255,255,255,0.12), transparent)" }}
+          />
+          <motion.div
+            animate={{ opacity: [0.3, 0.8, 0.3] }}
+            transition={{ repeat: Infinity, duration: 2.4, ease: "easeInOut", delay: 2.2 }}
+            className="text-[10px] font-mono tracking-[0.3em] text-[#2d3748] uppercase"
+          >
+            scroll
+          </motion.div>
+        </div>
+      </section>
+    </>
   );
 }

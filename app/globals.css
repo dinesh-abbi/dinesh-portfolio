@@ -9,12 +9,12 @@
   }
 
   html {
-    background-color: #080c14;
+    background-color: #050810;
     scroll-behavior: auto;
   }
 
   body {
-    @apply bg-bg-primary text-text-primary;
+    @apply bg-[#050810] text-text-primary;
     font-feature-settings: "ss01", "ss02", "cv01", "cv02";
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;

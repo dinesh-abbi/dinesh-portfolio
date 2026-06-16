@@ -66,7 +66,6 @@ function useScrollCanvas(canvasRef: React.RefObject<HTMLCanvasElement | null>, p
 
       // Accelerated particles
       particles.forEach((particle) => {
-        // Particles fall faster as you scroll deeper (warp speed)
         particle.x += particle.vx * (1 + p * 4);
         particle.y += particle.vy * (1 + p * 4) + (p * 5);
         if (particle.x < 0) particle.x = w;
@@ -79,7 +78,6 @@ function useScrollCanvas(canvasRef: React.RefObject<HTMLCanvasElement | null>, p
         ctx.shadowColor = particle.color;
         ctx.shadowBlur = 8 + p * 20;
         
-        // Stretch particles vertically based on speed to create motion blur
         const stretch = 1 + (p * 8);
         ctx.beginPath();
         ctx.ellipse(particle.x, particle.y, particle.radius, particle.radius * stretch, 0, 0, Math.PI * 2);
@@ -100,8 +98,8 @@ function useScrollCanvas(canvasRef: React.RefObject<HTMLCanvasElement | null>, p
   }, [canvasRef, progress]);
 }
 
-// Massive Split-Screen Glass Panel
-function SplitGlassPanel({
+// Open, Cardless Split-Screen Panel
+function SplitOpenPanel({
   opacity,
   y,
   step,
@@ -123,45 +121,43 @@ function SplitGlassPanel({
   return (
     <motion.div
       style={{ opacity, y }}
-      className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-5xl px-6 md:px-0 z-20"
+      className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-5xl px-6 md:px-0 z-20 pointer-events-none"
     >
-      <div className="glass p-0 rounded-3xl backdrop-blur-2xl bg-[#0d1422]/70 border border-white/5 shadow-[0_0_100px_rgba(0,0,0,0.5)] relative overflow-hidden flex flex-col md:flex-row">
+      <div className="flex flex-col md:flex-row gap-12 md:gap-20 items-center justify-between">
         
-        {/* Left Side: Content */}
-        <div className="p-10 md:p-14 md:w-3/5 relative z-10 border-r border-white/5">
-          <p className="text-xs font-mono text-accent-blue tracking-[0.2em] uppercase mb-6 flex items-center gap-3">
-            <span className="w-6 h-[1px] bg-accent-blue" />
+        {/* Left Side: Content (Completely Open, Elegant) */}
+        <div className="md:w-3/5 text-left pointer-events-auto">
+          <p className="text-xs font-mono text-accent-blue tracking-[0.25em] uppercase mb-6 flex items-center gap-3">
+            <span className="w-8 h-[1px] bg-accent-blue" />
             {step}
           </p>
-          <h2 className="text-3xl md:text-5xl font-display text-text-primary leading-tight mb-6">
+          <h2 className="text-3xl md:text-5xl lg:text-6xl font-display text-text-primary leading-tight mb-6 tracking-tight">
             {title}{" "}
-            <span className="italic text-accent-soft block mt-2">{highlight}</span>
+            <span className="italic text-accent-soft block mt-2 font-light">{highlight}</span>
           </h2>
-          <p className="text-text-subtle font-light leading-relaxed text-sm md:text-lg mb-8">
+          <p className="text-text-subtle font-light leading-relaxed text-base md:text-lg mb-8 max-w-xl">
             {description}
           </p>
           
-          <div className="flex flex-wrap gap-4">
+          <div className="flex flex-wrap gap-3">
             {metrics.map((metric, i) => (
-              <div key={i} className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs font-mono text-white/80">
+              <div key={i} className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs font-mono text-white/70">
                 {metric}
               </div>
             ))}
           </div>
         </div>
 
-        {/* Right Side: Visual Graphic */}
-        <div className="hidden md:flex md:w-2/5 bg-gradient-to-br from-black/40 to-black/80 items-center justify-center relative overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.1),transparent)]" />
-          <div className="relative z-10 w-32 h-32 rounded-full bg-white/5 border border-white/10 flex items-center justify-center shadow-[0_0_40px_rgba(59,130,246,0.2)]">
-             <Icon size={48} className="text-accent-blue opacity-80" strokeWidth={1} />
+        {/* Right Side: Large Open Graphic */}
+        <div className="hidden md:flex md:w-2/5 justify-center items-center relative h-64">
+          <div className="absolute w-48 h-48 rounded-full border border-white/5 bg-gradient-to-br from-accent-blue/10 to-transparent blur-md pointer-events-none" />
+          <div className="w-24 h-24 rounded-full border border-white/10 flex items-center justify-center relative z-10 shadow-[0_0_50px_rgba(59,130,246,0.1)]">
+             <Icon size={40} className="text-accent-blue opacity-75" strokeWidth={1} />
           </div>
           
-          {/* Decorative Code Lines */}
-          <div className="absolute top-12 right-12 opacity-20">
-            {Array.from({length: 6}).map((_, i) => (
-              <div key={i} className="h-1 bg-accent-blue rounded-full mb-3" style={{ width: Math.random() * 60 + 40 + 'px' }} />
-            ))}
+          {/* Decorative code simulation */}
+          <div className="absolute bottom-4 left-4 font-mono text-[9px] text-accent-blue/30 leading-normal pointer-events-none select-none">
+            {"const system = {\n  status: 'online',\n  auth: 'SuperTokens',\n  scale: '10k+'\n};"}
           </div>
         </div>
       </div>
@@ -214,8 +210,8 @@ export default function ScrollyCanvas() {
         {/* Canvas Background Layer */}
         <canvas ref={canvasRef} className="absolute inset-0 w-full h-full z-10" />
 
-        {/* Frosted Glass Panels */}
-        <SplitGlassPanel 
+        {/* Open, Frameless Panels */}
+        <SplitOpenPanel 
           opacity={panel1Opacity} 
           y={panel1Y} 
           step="01 / Infrastructure"
@@ -226,18 +222,18 @@ export default function ScrollyCanvas() {
           Icon={Network}
         />
 
-        <SplitGlassPanel 
+        <SplitOpenPanel 
           opacity={panel2Opacity} 
           y={panel2Y} 
           step="02 / Research"
           title="Scaling Compute for"
           highlight="DrugParadigm & Tantrik."
-          description="Built the entire frontend and monitoring dashboards for a 15-node GPU cluster dedicated to Alzheimer's research using Autodock Vina. Processed massive ligand-protein docking streams and visualized complex data at scale."
+          description="Built the entire frontend and monitoring dashboards for a 15-node GPU research cluster dedicated to Alzheimer's research using Autodock Vina. Processed massive ligand-protein docking streams and visualized complex data at scale."
           metrics={["15 GPU Nodes", "Autodock Vina", "Data Visualization"]}
           Icon={Database}
         />
 
-        <SplitGlassPanel 
+        <SplitOpenPanel 
           opacity={panel3Opacity} 
           y={panel3Y} 
           step="03 / Integration"

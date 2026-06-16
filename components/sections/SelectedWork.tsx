@@ -2,66 +2,84 @@
 
 import { useRef, useState } from "react";
 import { useScroll, useTransform, motion, AnimatePresence } from "motion/react";
-import { ArrowRight, X, ExternalLink } from "lucide-react";
+import { ArrowRight, X } from "lucide-react";
 import { projects, type Project } from "@/data/projects";
 
-function ProjectRow({ project, index }: { project: Project; index: number }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  const y = useTransform(scrollYProgress, [0, 1], [50, -50]);
-  const isEven = index % 2 === 0;
+function StackedProjectCard({ project, index, total }: { project: Project; index: number; total: number }) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  
+  // Calculate specific scroll tracking for this card
+  const { scrollYProgress } = useScroll({ 
+    target: cardRef,
+    // Start tracking when the card hits the top of the viewport
+    offset: ["start start", "end start"]
+  });
+
+  // Scale down the cards behind as you scroll past them
+  const scale = useTransform(scrollYProgress, [0, 1], [1, 0.95 - (total - index) * 0.01]);
+  // Fade out cards as they get pushed back
+  const opacity = useTransform(scrollYProgress, [0, 1], [1, 0.3]);
+  // Top offset to create the stacking effect
+  const top = `calc(10vh + ${index * 40}px)`;
+
   const [open, setOpen] = useState(false);
 
   return (
     <>
-      <div
-        ref={ref}
-        className="group relative border-t border-border-glass py-10 md:py-14 overflow-hidden cursor-pointer"
-        onClick={() => setOpen(true)}
-      >
-        {/* Hover shimmer bg */}
-        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none bg-gradient-card" />
-
+      <div className="h-screen w-full flex items-center justify-center sticky" style={{ top }}>
         <motion.div
-          style={{ y }}
-          className={`flex flex-col ${isEven ? "md:flex-row" : "md:flex-row-reverse"} items-start md:items-center gap-8 md:gap-16`}
+          ref={cardRef}
+          style={{ scale, opacity }}
+          onClick={() => setOpen(true)}
+          className="w-full max-w-5xl glass rounded-[2rem] p-8 md:p-14 cursor-pointer group hover:border-accent-blue/30 transition-colors shadow-2xl relative overflow-hidden"
         >
-          {/* Index */}
-          <span className="text-[11px] font-mono text-text-muted shrink-0 w-8">
-            {String(index + 1).padStart(2, "0")}
-          </span>
-
-          {/* Main content */}
-          <div className={`flex-1 ${isEven ? "" : "md:text-right"}`}>
-            <div className="flex items-center gap-3 mb-1.5 flex-wrap">
-              {project.tags.map((tag) => (
-                <span key={tag} className="text-[10px] font-mono text-accent-blue border border-border-blue rounded-full px-2.5 py-0.5 uppercase tracking-wider">
-                  {tag}
+          {/* Accent glow on hover */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-accent-blue/10 to-transparent rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+          
+          <div className="flex flex-col md:flex-row gap-8 md:gap-16 relative z-10">
+            {/* Left side: Index & Tags */}
+            <div className="md:w-1/3 flex flex-col justify-between">
+              <div>
+                <span className="text-4xl md:text-6xl font-display text-white/10 font-bold tracking-tighter mb-4 block">
+                  0{index + 1}
                 </span>
-              ))}
+                <p className="text-xs font-mono text-accent-blue tracking-[0.2em] uppercase mb-4">
+                  {project.subtitle}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {project.tags.map((tag) => (
+                    <span key={tag} className="text-[10px] font-mono text-text-muted border border-border-glass rounded-full px-3 py-1 uppercase tracking-wider">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
             </div>
-            <h3 className="text-2xl md:text-3xl font-display text-text-primary mb-3 group-hover:text-white transition-colors">
-              {project.title}
-            </h3>
-            <p className="text-text-muted font-light leading-relaxed max-w-xl text-sm md:text-base">
-              {project.description}
-            </p>
-          </div>
 
-          {/* Stack + Arrow */}
-          <div className={`shrink-0 flex flex-col gap-4 ${isEven ? "md:items-end" : ""}`}>
-            <p className="text-[11px] font-mono text-text-muted leading-relaxed max-w-[180px] text-right">
-              {project.stack.join(" · ")}
-            </p>
-            <div className="flex items-center gap-1.5 text-accent-blue text-xs font-medium group-hover:gap-3 transition-all">
-              <span>View Details</span>
-              <ArrowRight size={12} />
+            {/* Right side: Content */}
+            <div className="md:w-2/3 flex flex-col justify-center">
+              <h3 className="text-3xl md:text-5xl font-display text-text-primary mb-6 group-hover:text-white transition-colors">
+                {project.title}
+              </h3>
+              <p className="text-text-subtle font-light leading-relaxed mb-8 text-base md:text-lg">
+                {project.description}
+              </p>
+              
+              <div className="flex flex-wrap items-center justify-between gap-4 mt-auto">
+                <p className="text-xs font-mono text-text-muted">
+                  {project.stack.join(" · ")}
+                </p>
+                <div className="flex items-center gap-2 text-accent-blue text-sm font-medium group-hover:translate-x-2 transition-transform">
+                  <span>View Details</span>
+                  <ArrowRight size={14} />
+                </div>
+              </div>
             </div>
           </div>
         </motion.div>
       </div>
 
-      {/* Slide-in detail panel */}
+      {/* Slide-in detail panel (kept from previous iteration but polished) */}
       <AnimatePresence>
         {open && (
           <>
@@ -69,7 +87,7 @@ function ProjectRow({ project, index }: { project: Project; index: number }) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-bg-primary/80 backdrop-blur-sm z-40"
+              className="fixed inset-0 bg-[#050810]/80 backdrop-blur-md z-40"
               onClick={() => setOpen(false)}
             />
             <motion.div
@@ -78,40 +96,40 @@ function ProjectRow({ project, index }: { project: Project; index: number }) {
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 28, stiffness: 220 }}
               data-lenis-prevent
-              className="fixed top-0 right-0 bottom-0 w-full md:w-[520px] glass border-l border-border-glass z-50 p-8 md:p-12 overflow-y-auto"
+              className="fixed top-0 right-0 bottom-0 w-full md:w-[600px] glass border-l border-white/10 z-50 p-8 md:p-14 overflow-y-auto"
             >
               <button
                 onClick={() => setOpen(false)}
-                className="absolute top-8 right-8 p-2 text-text-muted hover:text-text-primary hover:bg-bg-elevated rounded-full transition-colors"
+                className="absolute top-8 right-8 p-3 text-text-muted hover:text-white hover:bg-white/5 rounded-full transition-colors"
               >
-                <X size={18} />
+                <X size={20} />
               </button>
 
-              <div className="mt-12">
-                <p className="text-xs font-mono text-accent-blue tracking-[0.2em] uppercase mb-3">
+              <div className="mt-16">
+                <p className="text-xs font-mono text-accent-blue tracking-[0.2em] uppercase mb-4">
                   {project.subtitle}
                 </p>
-                <h3 className="text-2xl md:text-3xl font-display text-text-primary mb-8">
+                <h3 className="text-3xl md:text-4xl font-display text-white mb-10">
                   {project.title}
                 </h3>
 
-                <div className="h-[1px] w-full bg-gradient-to-r from-accent-blue/30 via-accent-orange/20 to-transparent mb-8" />
+                <div className="h-[1px] w-full bg-gradient-to-r from-accent-blue/30 via-accent-orange/20 to-transparent mb-10" />
 
-                <h4 className="text-xs font-mono uppercase tracking-widest text-text-muted mb-4">
+                <h4 className="text-xs font-mono uppercase tracking-widest text-text-muted mb-5">
                   Deep Dive
                 </h4>
-                <p className="text-text-subtle leading-relaxed font-light mb-10 text-sm">
+                <p className="text-text-subtle leading-relaxed font-light mb-12 text-base">
                   {project.detail}
                 </p>
 
-                <h4 className="text-xs font-mono uppercase tracking-widest text-text-muted mb-4">
-                  Stack
+                <h4 className="text-xs font-mono uppercase tracking-widest text-text-muted mb-5">
+                  Tech Stack
                 </h4>
                 <div className="flex flex-wrap gap-2">
                   {project.stack.map((s) => (
                     <span
                       key={s}
-                      className="text-xs font-mono text-text-subtle px-3 py-1.5 border border-border-glass rounded-full"
+                      className="text-xs font-mono text-white/70 px-4 py-2 bg-white/5 border border-white/10 rounded-full"
                     >
                       {s}
                     </span>
@@ -128,33 +146,32 @@ function ProjectRow({ project, index }: { project: Project; index: number }) {
 
 export default function SelectedWork() {
   return (
-    <section id="work" className="w-full py-24 md:py-32 px-6 md:px-12 bg-bg-primary">
-      <div className="max-w-6xl mx-auto">
+    <section id="work" className="w-full bg-[#050810] relative pb-32">
+      {/* Title Section */}
+      <div className="pt-32 pb-16 px-6 md:px-12 max-w-6xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.7, ease: "easeOut" }}
-          className="mb-16 md:mb-20 flex flex-col md:flex-row md:items-end justify-between gap-6"
+          viewport={{ once: true }}
+          transition={{ duration: 0.7 }}
         >
-          <div>
-            <p className="text-xs font-mono text-accent-blue tracking-[0.2em] uppercase mb-4">
-              Selected Work
-            </p>
-            <h2 className="text-3xl md:text-4xl font-display text-text-primary">
-              Projects that shipped.
-            </h2>
-          </div>
-          <p className="text-text-muted font-light max-w-xs text-sm md:text-right">
-            Production systems with real users, not demos.
+          <p className="text-xs font-mono text-accent-blue tracking-[0.2em] uppercase mb-4">
+            Selected Work
+          </p>
+          <h2 className="text-4xl md:text-6xl font-display text-text-primary">
+            Projects that shipped.
+          </h2>
+          <p className="text-text-muted font-light mt-6 max-w-md text-lg">
+            Production systems with real users, not weekend demos.
           </p>
         </motion.div>
+      </div>
 
-        <div className="border-b border-border-glass">
-          {projects.map((project, i) => (
-            <ProjectRow key={project.id} project={project} index={i} />
-          ))}
-        </div>
+      {/* Stacked Cards Container */}
+      <div className="relative w-full px-6 md:px-12 pb-32">
+        {projects.map((project, i) => (
+          <StackedProjectCard key={project.id} project={project} index={i} total={projects.length} />
+        ))}
       </div>
     </section>
   );

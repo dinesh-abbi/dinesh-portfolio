@@ -3,7 +3,6 @@
 import { useRef, useEffect } from "react";
 import { useScroll, useTransform, motion, type MotionValue } from "motion/react";
 
-// Procedural canvas animation — scrubbed by scroll progress (Castimedia mechanic)
 function useScrollCanvas(canvasRef: React.RefObject<HTMLCanvasElement | null>, progress: { get: () => number }) {
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -50,55 +49,43 @@ function useScrollCanvas(canvasRef: React.RefObject<HTMLCanvasElement | null>, p
 
       ctx.clearRect(0, 0, w, h);
 
-      // Cinematic dual-tone background — blue top left, orange bottom right
+      // Deep cinematic base
       const bgGrad = ctx.createRadialGradient(w * 0.25, h * 0.35, 0, w * 0.25, h * 0.35, w * 0.8);
-      bgGrad.addColorStop(0, `rgba(30, 58, 95, ${0.4 + p * 0.3})`);
-      bgGrad.addColorStop(1, `rgba(8, 12, 20, 1)`);
+      bgGrad.addColorStop(0, `rgba(30, 58, 95, ${0.2 + p * 0.5})`); // Intensifies on scroll
+      bgGrad.addColorStop(1, `#050810`);
       ctx.fillStyle = bgGrad;
       ctx.fillRect(0, 0, w, h);
 
-      // Orange warm accent — scrubbed by scroll
+      // Orange warp flare
       const ogGrad = ctx.createRadialGradient(w * (0.6 + p * 0.2), h * (0.5 + p * 0.3), 0, w * (0.6 + p * 0.2), h * (0.5 + p * 0.3), w * 0.55);
-      ogGrad.addColorStop(0, `rgba(249, 115, 22, ${0.08 + p * 0.1})`);
+      ogGrad.addColorStop(0, `rgba(249, 115, 22, ${0.05 + p * 0.25})`);
       ogGrad.addColorStop(1, "transparent");
       ctx.fillStyle = ogGrad;
       ctx.fillRect(0, 0, w, h);
 
-      // Particles — speed + glow intensity driven by scroll
+      // Accelerated particles
       particles.forEach((particle) => {
-        particle.x += particle.vx * (1 + p * 2);
-        particle.y += particle.vy * (1 + p * 2);
+        // Particles fall faster as you scroll deeper (warp speed)
+        particle.x += particle.vx * (1 + p * 4);
+        particle.y += particle.vy * (1 + p * 4) + (p * 5);
         if (particle.x < 0) particle.x = w;
         if (particle.x > w) particle.x = 0;
         if (particle.y < 0) particle.y = h;
         if (particle.y > h) particle.y = 0;
 
         ctx.save();
-        ctx.globalAlpha = particle.alpha * (0.5 + p * 0.8);
+        ctx.globalAlpha = particle.alpha * (0.5 + p * 1.5);
         ctx.shadowColor = particle.color;
-        ctx.shadowBlur = 8 + p * 16;
+        ctx.shadowBlur = 8 + p * 20;
+        
+        // Stretch particles vertically based on speed to create motion blur
+        const stretch = 1 + (p * 8);
         ctx.beginPath();
-        ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+        ctx.ellipse(particle.x, particle.y, particle.radius, particle.radius * stretch, 0, 0, Math.PI * 2);
         ctx.fillStyle = particle.color;
         ctx.fill();
         ctx.restore();
       });
-
-      // Horizon line — expands on scroll
-      const lineW = w * (0.15 + p * 0.7);
-      const lineX = (w - lineW) / 2;
-      const lineY = h * 0.62;
-      const lineGrad = ctx.createLinearGradient(lineX, 0, lineX + lineW, 0);
-      lineGrad.addColorStop(0, "transparent");
-      lineGrad.addColorStop(0.4, `rgba(59, 130, 246, ${0.4 + p * 0.4})`);
-      lineGrad.addColorStop(0.6, `rgba(249, 115, 22, ${0.3 + p * 0.3})`);
-      lineGrad.addColorStop(1, "transparent");
-      ctx.strokeStyle = lineGrad;
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(lineX, lineY);
-      ctx.lineTo(lineX + lineW, lineY);
-      ctx.stroke();
 
       raf = requestAnimationFrame(draw);
     };
@@ -112,26 +99,32 @@ function useScrollCanvas(canvasRef: React.RefObject<HTMLCanvasElement | null>, p
   }, [canvasRef, progress]);
 }
 
-// Overlay text panel shown at a specific scroll range
-function TextPanel({
+// Glass Panel 
+function GlassPanel({
   children,
   opacity,
-  x,
+  y,
   align = "left",
 }: {
   children: React.ReactNode;
   opacity: MotionValue<number>;
-  x: MotionValue<number>;
+  y: MotionValue<number>;
   align?: "left" | "right" | "center";
 }) {
   return (
     <motion.div
-      style={{ opacity, x }}
-      className={`absolute top-1/2 -translate-y-1/2 max-w-sm z-10 ${
-        align === "right" ? "right-16 text-right" : align === "center" ? "left-1/2 -translate-x-1/2 text-center" : "left-16"
+      style={{ opacity, y }}
+      className={`absolute top-1/2 -translate-y-1/2 max-w-lg z-20 ${
+        align === "right" ? "right-6 md:right-24" : align === "center" ? "left-1/2 -translate-x-1/2 text-center" : "left-6 md:left-24"
       }`}
     >
-      {children}
+      <div className="glass p-8 md:p-12 rounded-3xl backdrop-blur-2xl bg-[#0d1422]/60 border border-white/5 shadow-2xl relative overflow-hidden">
+        {/* Glow accent inside card */}
+        <div className="absolute -top-20 -left-20 w-40 h-40 bg-accent-blue/20 blur-3xl rounded-full pointer-events-none" />
+        <div className="relative z-10">
+          {children}
+        </div>
+      </div>
     </motion.div>
   );
 }
@@ -147,74 +140,93 @@ export default function ScrollyCanvas() {
 
   useScrollCanvas(canvasRef, scrollYProgress);
 
-  // Panel 1: 0%–25% scroll
-  const panel1Opacity = useTransform(scrollYProgress, [0, 0.1, 0.2, 0.28], [0, 1, 1, 0]);
-  const panel1X = useTransform(scrollYProgress, [0, 0.1], [-40, 0]);
+  // Background Massive Typography Parallax
+  const bgTextY1 = useTransform(scrollYProgress, [0, 1], ["0%", "-40%"]);
+  const bgTextY2 = useTransform(scrollYProgress, [0, 1], ["20%", "-60%"]);
 
-  // Panel 2: 30%–55% scroll
-  const panel2Opacity = useTransform(scrollYProgress, [0.3, 0.38, 0.5, 0.58], [0, 1, 1, 0]);
-  const panel2X = useTransform(scrollYProgress, [0.3, 0.38], [40, 0]);
+  // Condense ranges: total height is now 300vh instead of 500vh
+  // Panel 1: 0%–30% scroll
+  const panel1Opacity = useTransform(scrollYProgress, [0, 0.1, 0.25, 0.35], [0, 1, 1, 0]);
+  const panel1Y = useTransform(scrollYProgress, [0, 0.1, 0.25, 0.35], [60, 0, 0, -60]);
 
-  // Panel 3: 60%–85% scroll
-  const panel3Opacity = useTransform(scrollYProgress, [0.6, 0.68, 0.8, 0.88], [0, 1, 1, 0]);
-  const panel3X = useTransform(scrollYProgress, [0.6, 0.68], [-40, 0]);
+  // Panel 2: 35%–65% scroll
+  const panel2Opacity = useTransform(scrollYProgress, [0.35, 0.45, 0.55, 0.65], [0, 1, 1, 0]);
+  const panel2Y = useTransform(scrollYProgress, [0.35, 0.45, 0.55, 0.65], [60, 0, 0, -60]);
+
+  // Panel 3: 65%–100% scroll
+  const panel3Opacity = useTransform(scrollYProgress, [0.65, 0.75, 0.9, 1], [0, 1, 1, 0]);
+  const panel3Y = useTransform(scrollYProgress, [0.65, 0.75, 0.9, 1], [60, 0, 0, -60]);
 
   return (
-    <section ref={sectionRef} className="relative h-[500vh]">
-      {/* Sticky viewport */}
-      <div className="sticky top-0 h-screen overflow-hidden">
-        {/* Canvas fills the entire sticky viewport */}
-        <canvas
-          ref={canvasRef}
-          className="absolute inset-0 w-full h-full"
-        />
+    <section ref={sectionRef} className="relative h-[300vh]">
+      <div className="sticky top-0 h-screen overflow-hidden bg-[#050810]">
+        
+        {/* Massive Background Outline Typography to fill empty space */}
+        <div className="absolute inset-0 pointer-events-none z-0 flex flex-col justify-center overflow-hidden opacity-[0.03]">
+          <motion.div style={{ y: bgTextY1 }} className="whitespace-nowrap font-display text-[20vw] leading-none font-bold text-transparent stroke-text">
+            SYSTEM ARCHITECTURE
+          </motion.div>
+          <motion.div style={{ y: bgTextY2 }} className="whitespace-nowrap font-display text-[20vw] leading-none font-bold text-transparent stroke-text ml-[-10vw]">
+            PRODUCTION READY
+          </motion.div>
+        </div>
 
-        {/* Overlay text panels — Castimedia spec: 0% left · 30% right · 60% left */}
-        <TextPanel opacity={panel1Opacity} x={panel1X} align="left">
-          <p className="text-xs font-mono text-accent-blue tracking-[0.2em] uppercase mb-3">
+        {/* Canvas Background Layer */}
+        <canvas ref={canvasRef} className="absolute inset-0 w-full h-full z-10" />
+
+        {/* Frosted Glass Panels */}
+        <GlassPanel opacity={panel1Opacity} y={panel1Y} align="left">
+          <p className="text-xs font-mono text-accent-blue tracking-[0.2em] uppercase mb-4">
             01 / Background
           </p>
-          <h2 className="text-3xl md:text-4xl font-display text-text-primary leading-tight mb-4">
+          <h2 className="text-3xl md:text-5xl font-display text-text-primary leading-tight mb-6">
             3+ Years Building{" "}
-            <span className="italic text-accent-soft">Production Systems</span>
+            <span className="italic text-accent-soft block mt-1">At Scale.</span>
           </h2>
-          <p className="text-text-muted font-light leading-relaxed text-sm">
-            From enterprise platforms serving 10,000+ students to AI infrastructure on GPU clusters — I build things that scale.
+          <p className="text-text-subtle font-light leading-relaxed text-sm md:text-base">
+            From enterprise platforms serving 10,000+ students to AI infrastructure on GPU clusters. I don't just write code; I design systems that hold up under pressure.
           </p>
-        </TextPanel>
+        </GlassPanel>
 
-        <TextPanel opacity={panel2Opacity} x={panel2X} align="right">
-          <p className="text-xs font-mono text-accent-orange tracking-[0.2em] uppercase mb-3">
+        <GlassPanel opacity={panel2Opacity} y={panel2Y} align="right">
+          <p className="text-xs font-mono text-accent-orange tracking-[0.2em] uppercase mb-4">
             02 / Approach
           </p>
-          <h2 className="text-3xl md:text-4xl font-display text-text-primary leading-tight mb-4">
+          <h2 className="text-3xl md:text-5xl font-display text-text-primary leading-tight mb-6">
             End-to-End{" "}
-            <span className="italic text-orange-400">Ownership</span>
+            <span className="italic text-orange-400 block mt-1">Ownership.</span>
           </h2>
-          <p className="text-text-muted font-light leading-relaxed text-sm">
-            Schema design, REST APIs, security, responsive UI — I own the full lifecycle and ship on time.
+          <p className="text-text-subtle font-light leading-relaxed text-sm md:text-base">
+            PostgreSQL schemas, REST APIs, middleware security, and responsive UI — I own the full lifecycle. No throwing code over the wall to another team.
           </p>
-        </TextPanel>
+        </GlassPanel>
 
-        <TextPanel opacity={panel3Opacity} x={panel3X} align="left">
-          <p className="text-xs font-mono text-accent-soft tracking-[0.2em] uppercase mb-3">
+        <GlassPanel opacity={panel3Opacity} y={panel3Y} align="left">
+          <p className="text-xs font-mono text-accent-soft tracking-[0.2em] uppercase mb-4">
             03 / Now
           </p>
-          <h2 className="text-3xl md:text-4xl font-display text-text-primary leading-tight mb-4">
-            Integrating{" "}
-            <span className="italic text-accent-soft">AI into Real Products</span>
+          <h2 className="text-3xl md:text-5xl font-display text-text-primary leading-tight mb-6">
+            Integrating AI{" "}
+            <span className="italic text-accent-soft block mt-1">With Purpose.</span>
           </h2>
-          <p className="text-text-muted font-light leading-relaxed text-sm">
-            From Gemini-powered grading engines to wellness coaches — I build AI features that make real products meaningfully smarter.
+          <p className="text-text-subtle font-light leading-relaxed text-sm md:text-base">
+            Moving beyond simple wrappers. I build AI features like Gemini-powered grading engines and context-aware health coaches that make real products demonstrably better.
           </p>
-        </TextPanel>
+        </GlassPanel>
 
         {/* Scroll progress bar */}
         <motion.div
           style={{ scaleX: scrollYProgress, transformOrigin: "left" }}
-          className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-accent-blue via-accent-soft to-accent-orange"
+          className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-accent-blue via-accent-soft to-accent-orange z-30"
         />
       </div>
+      
+      {/* CSS for Outline Text */}
+      <style dangerouslySetInnerHTML={{__html: `
+        .stroke-text {
+          -webkit-text-stroke: 1px rgba(255, 255, 255, 1);
+        }
+      `}} />
     </section>
   );
 }

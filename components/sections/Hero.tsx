@@ -4,6 +4,8 @@ import { useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import { motion } from "motion/react";
 
+// Load 3D and heavy interactive elements client-side only
+const ParticleField = dynamic(() => import("@/components/three/ParticleField"), { ssr: false });
 const CursorSpotlight = dynamic(() => import("@/components/ui/CursorSpotlight"), { ssr: false });
 const AmbientCanvas = dynamic(() => import("@/components/ui/AmbientCanvas"), { ssr: false });
 
@@ -22,7 +24,6 @@ function NameLine({ text, delay = 0 }: { text: string; delay?: number }) {
             opacity: 0,
             filter: "blur(20px)",
             display: "inline-block",
-            // Prevent layout shift when blur animates
             willChange: "opacity, filter, letter-spacing",
           }}
         >
@@ -52,7 +53,7 @@ export default function Hero() {
         delay: stagger(55, { start: 200 }),
       });
 
-      // Tagline fade after letters settle
+      // Tagline fade
       animate(".hero-tagline", {
         opacity: [0, 1],
         translateY: [16, 0],
@@ -61,13 +62,13 @@ export default function Hero() {
         delay: 1400,
       });
 
-      // Scroll cue last
-      animate(".hero-scroll-line", {
+      // Marquee fade in
+      animate(".hero-marquee", {
         opacity: [0, 1],
-        scaleY: [0, 1],
+        translateY: [20, 0],
         ease: "outCubic",
-        duration: 700,
-        delay: 2000,
+        duration: 1000,
+        delay: 1800,
       });
     };
 
@@ -75,73 +76,54 @@ export default function Hero() {
   }, []);
 
   return (
-    <>
-      {/* Ambient background canvas */}
+    <section className="relative w-full h-screen overflow-hidden bg-[#050810]">
+      {/* 1. Ambient Background Layer */}
       <AmbientCanvas />
 
-      {/* Cursor flashlight */}
+      {/* 2. Interactive 3D Particles Layer */}
+      <ParticleField />
+
+      {/* 3. Cursor Flashlight Layer */}
       <CursorSpotlight />
 
-      {/* Hidden dot grid — only visible through the spotlight */}
-      <div
-        aria-hidden
-        className="fixed inset-0 -z-[5] pointer-events-none"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle, rgba(255,255,255,0.18) 1px, transparent 1px)",
-          backgroundSize: "32px 32px",
-          maskImage:
-            "radial-gradient(ellipse 70% 70% at 50% 50%, transparent 100%, black 100%)",
-        }}
-      />
-
-      {/* Main hero content */}
-      <section
-        className="relative flex flex-col items-center justify-center w-full min-h-screen overflow-hidden"
-        aria-label="Dinesh Abbi — Portfolio"
-      >
-        {/* Name block — center stage */}
-        <div className="relative z-20 flex flex-col items-center select-none px-4">
-          {/* LINE 1 */}
+      {/* 4. Typography Layer */}
+      <div className="absolute inset-0 z-20 flex flex-col items-center justify-center pointer-events-none">
+        <div className="flex flex-col items-center select-none px-4">
           <div
-            className="font-display font-medium tracking-[0.08em] text-[clamp(4.5rem,13vw,10.5rem)] leading-none text-[#ebebeb]"
+            className="font-display font-medium tracking-[0.08em] text-[clamp(4.5rem,13vw,10.5rem)] leading-none text-[#ebebeb] mix-blend-exclusion"
             style={{ letterSpacing: "0.06em" }}
           >
             <NameLine text={LINE1} />
           </div>
 
-          {/* LINE 2 — italic, slightly smaller to break symmetry */}
           <div
-            className="font-display italic font-light tracking-[0.12em] text-[clamp(3.8rem,11.5vw,9.5rem)] leading-none mt-[-0.04em]"
+            className="font-display italic font-light tracking-[0.12em] text-[clamp(3.8rem,11.5vw,9.5rem)] leading-none mt-[-0.04em] mix-blend-exclusion"
             style={{ color: "#c8c8c8" }}
           >
             <NameLine text={LINE2} delay={LINE1.length * 55} />
           </div>
         </div>
 
-        {/* Tagline — single line, centered, below name */}
         <p
-          className="hero-tagline relative z-20 mt-12 text-sm md:text-base font-light tracking-[0.25em] uppercase text-[#4a5568] opacity-0"
+          className="hero-tagline mt-12 text-sm md:text-base font-light tracking-[0.25em] uppercase text-[#718096] opacity-0"
           style={{ fontFamily: "var(--font-inter)" }}
         >
           Building systems that work.
         </p>
+      </div>
 
-        {/* Scroll cue — thin pulsing line at bottom center */}
-        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 z-20">
-          <div
-            className="hero-scroll-line origin-top opacity-0"
-            style={{ width: 1, height: 56, background: "linear-gradient(to bottom, transparent, rgba(255,255,255,0.12), transparent)" }}
-          />
-          <motion.div
-            animate={{ opacity: [0.3, 0.8, 0.3] }}
-            transition={{ repeat: Infinity, duration: 2.4, ease: "easeInOut", delay: 2.2 }}
-            className="text-[10px] font-mono tracking-[0.3em] text-[#2d3748] uppercase"
-          >
-            scroll
-          </motion.div>
-        </div>
-      </section>
-    </>
+      {/* 5. Infinite Marquee Bottom Banner */}
+      <div className="hero-marquee absolute bottom-0 left-0 w-full overflow-hidden border-t border-white/5 bg-black/40 backdrop-blur-md py-3 opacity-0 z-30">
+        <motion.div
+          animate={{ x: ["0%", "-50%"] }}
+          transition={{ repeat: Infinity, duration: 25, ease: "linear" }}
+          className="flex whitespace-nowrap text-[11px] font-mono tracking-[0.3em] uppercase text-[#4a5568]"
+        >
+          {Array(4)
+            .fill("SOFTWARE DEVELOPER · FULL STACK · AI INTEGRATION · SYSTEM ARCHITECTURE · ")
+            .join("")}
+        </motion.div>
+      </div>
+    </section>
   );
 }
